@@ -3,6 +3,7 @@
     "target": "ES6",
     "outDir": "./build/",
     "module": "commonjs",
+    "allowSyntheticDefaultImports": true,
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
