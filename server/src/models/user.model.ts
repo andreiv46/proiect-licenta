@@ -7,7 +7,11 @@ export interface UserInput {
     password: string;
 }
 
-export type UserWithoutPassword = Omit<UserInput, "password">;
+export type UserWithoutPassword = {
+    id: string;
+    username: string;
+    email: string;
+};
 
 export interface UserDocument extends UserInput, mongoose.Document {
     createdAt: Date;
@@ -54,7 +58,11 @@ userSchema.methods.comparePassword = async function (
 
 userSchema.methods.sanitize = function (): UserWithoutPassword {
     const user = this.toObject();
-    const sanitizedUser = { username: user.username, email: user.email };
+    const sanitizedUser = {
+        id: user._id,
+        username: user.username,
+        email: user.email,
+    };
     return sanitizedUser;
 };
 

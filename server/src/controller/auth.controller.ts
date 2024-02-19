@@ -3,16 +3,16 @@ import {
     registerUser,
     findUserByEmailOrUsername,
     authenticateUser,
+    generateToken,
 } from "../service/user.service";
 import { UserAlreadyExistsError } from "../errors/auth.errors";
 import { RegisterInput, LoginInput } from "../schema/user.schema";
-import jwt from "jsonwebtoken";
 
 export async function register(
     req: Request<{}, {}, RegisterInput["body"]>,
     res: Response,
     next: NextFunction
-) {
+): Promise<Response | void> {
     try {
         const { email, username } = req.body;
 
@@ -25,7 +25,7 @@ export async function register(
         const user = await registerUser(req.body);
         return res.status(201).json(user);
     } catch (error: unknown) {
-        return next(error);
+        next(error);
     }
 }
 
@@ -33,17 +33,21 @@ export async function login(
     req: Request<{}, {}, LoginInput["body"]>,
     res: Response,
     next: NextFunction
-) {
+): Promise<Response | void> {
     try {
         const { email, password } = req.body;
         const user = await authenticateUser(email, password);
 
-        const token = jwt.sign({ user }, process.env.JWT_SECRET_KEY!, {
-            expiresIn: "1h",
-        });
+        const payload = {
+            id: user.id,
+            email: user.email,
+            username: user.username,
+        };
+
+        const token = generateToken(payload);
 
         return res.status(200).json({ user, token });
     } catch (error: unknown) {
-        return next(error);
+        next(error);
     }
 }

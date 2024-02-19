@@ -1,6 +1,8 @@
 import UserModel from "../models/user.model";
 import { UserWithoutPassword, UserInput } from "../models/user.model";
 import { UserNotFoundError, InvalidPasswordError } from "../errors/auth.errors";
+import jwt from "jsonwebtoken";
+import "dotenv/config";
 
 export async function registerUser(
     input: UserInput
@@ -32,4 +34,10 @@ export async function authenticateUser(
         throw new InvalidPasswordError();
     }
     return user.sanitize();
+}
+
+export function generateToken(payload: object): string {
+    return jwt.sign(payload, process.env.JWT_SECRET_KEY!, {
+        expiresIn: "24h", // for testing purposes
+    });
 }

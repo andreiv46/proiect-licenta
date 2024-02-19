@@ -4,6 +4,7 @@ import {
 } from "@azure/ai-form-recognizer";
 import "dotenv/config";
 import vault from "./vault";
+import * as fs from "fs";
 
 const client = (async () => {
     const key = (await vault.getSecret("DIKey")).value;
@@ -14,10 +15,11 @@ const client = (async () => {
     return new DocumentAnalysisClient(endpoint, new AzureKeyCredential(key));
 })();
 
-export const analyzeReceiptForm = async (formURL: string) => {
+export const analyzeReceiptForm = async (formPath: string) => {
+    const file = fs.createReadStream(formPath);
     const poller = await (
         await client
-    ).beginAnalyzeDocumentFromUrl("prebuilt-receipt", formURL);
+    ).beginAnalyzeDocument("prebuilt-receipt", file);
 
     const pollerResult = await poller.pollUntilDone();
 

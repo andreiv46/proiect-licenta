@@ -5,14 +5,16 @@ import cors from "cors";
 import connect from "./utils/mongodb-connection";
 import authRoutes from "./routes/auth.routes";
 import { errorHandler } from "./utils/errors";
+import receiptRoutes from "./routes/receipt.routes";
+import { verifyToken } from "./middlewares/validateToken";
 
 const app = express();
-app.use(express.json());
-app.use(cors());
 
-app.use("/auth", authRoutes);
-
-app.use(errorHandler);
+app.use(express.json())
+    .use(cors())
+    .use("/auth", authRoutes)
+    .use("/receipt", verifyToken, receiptRoutes)
+    .use(errorHandler);
 
 app.listen(process.env.PORT, async () => {
     logger.info(`Server is running on localhost:${process.env.PORT}`);

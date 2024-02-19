@@ -11,7 +11,7 @@ export const registerSchema = object({
         password: string({
             required_error: "Password is required",
         }).min(5, "Password too short - should be at least 5 characters long"),
-    }),
+    }).strict(),
 });
 
 export const loginSchema = object({
@@ -22,7 +22,7 @@ export const loginSchema = object({
         password: string({
             required_error: "Password is required",
         }).min(5, "Password too short - should be at least 5 characters long"),
-    }),
+    }).strict(),
 });
 
 export type RegisterInput = TypeOf<typeof registerSchema>;
