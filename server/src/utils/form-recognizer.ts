@@ -5,21 +5,35 @@ import {
 import "dotenv/config";
 import vault from "./vault";
 import * as fs from "fs";
+import logger from "./logger";
 
-const client = (async () => {
+let formRecognizerClient: DocumentAnalysisClient | null = null;
+
+export async function initializeFormRecognizerClient() {
     const key = (await vault.getSecret("DIKey")).value;
     const endpoint = (await vault.getSecret("DIEndpoint")).value;
     if (!key || !endpoint) {
         throw new Error("Key or endpoint not found in the vault.");
     }
-    return new DocumentAnalysisClient(endpoint, new AzureKeyCredential(key));
-})();
+    formRecognizerClient = new DocumentAnalysisClient(
+        endpoint,
+        new AzureKeyCredential(key)
+    );
+    logger.info("Form Recognizer client initialized.");
+}
+
+export function getFormRecognizerClient() {
+    if (!formRecognizerClient) {
+        logger.error("Form Recognizer client not initialized.");
+        process.exit(1);
+    }
+    return formRecognizerClient;
+}
 
 export const analyzeReceiptForm = async (formPath: string) => {
     const file = fs.createReadStream(formPath);
-    const poller = await (
-        await client
-    ).beginAnalyzeDocument("prebuilt-receipt", file);
+    const client = getFormRecognizerClient();
+    const poller = await client.beginAnalyzeDocument("prebuilt-receipt", file);
 
     const pollerResult = await poller.pollUntilDone();
 

@@ -1,19 +1,29 @@
 import { Router } from "express";
-import { uploadReceipt } from "../utils/multer";
-import { createReceipt } from "../controller/receipt.controller";
+import {
+    createReceiptHandler,
+    getReceiptsHandler,
+    deleteReceiptHandler,
+    getReceiptHandler,
+} from "../controller/receipt.controller";
 import { validateFile } from "../middlewares/validateFile";
 import { createReceiptSchema } from "../schema/receipt.schema";
 import { validate } from "../middlewares/validateResource";
+import { uploadReceipt } from "../middlewares/fileUpload";
+
 import "dotenv/config";
 
 const router = Router();
 
-router.post(
-    "/test",
-    uploadReceipt.single(process.env.RECEIPT_UPLOAD_FILE_KEY as string),
-    validate(createReceiptSchema),
-    validateFile,
-    createReceipt
-);
+router
+    .post(
+        "/",
+        uploadReceipt,
+        validateFile,
+        validate(createReceiptSchema),
+        createReceiptHandler
+    )
+    .get("/", getReceiptsHandler)
+    .get("/:id", getReceiptHandler)
+    .delete("/:id", deleteReceiptHandler);
 
 export default router;

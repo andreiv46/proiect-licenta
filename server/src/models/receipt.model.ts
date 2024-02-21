@@ -7,32 +7,40 @@ export interface ReceiptInput {
     total?: number;
 }
 
-interface Item {
+export interface Item {
     description: string;
     price: number;
     quantity?: number;
     totalPrice: number;
-    productCode?: string;
     quantityUnit?: string;
 }
 
-export interface ReceiptDocument extends mongoose.Document {
-    user: UserDocument["_id"];
+export interface Receipt {
     merchantName?: string;
     merchantPhoneNumber?: string;
     merchantAddress?: string;
     total: number;
-    transactionDate?: Date;
+    transactionDate?: string;
     transactionTime?: string;
     subtotal?: number;
     totalTax?: number;
     items?: Item[];
-    analyzed: boolean;
-    createdAt: Date;
-    updatedAt: Date;
 }
 
-export const receiptSchema = new mongoose.Schema(
+export interface SanitizedReceipt extends Receipt {
+    analyzed: boolean;
+}
+
+export interface ReceiptDocument extends Receipt, mongoose.Document {
+    user: UserDocument["_id"];
+    analyzed: boolean;
+    filePath: string;
+    createdAt: Date;
+    updatedAt: Date;
+    sanitize(): SanitizedReceipt;
+}
+
+export const receiptSchema = new mongoose.Schema<ReceiptDocument, ReceiptModel>(
     {
         user: {
             type: mongoose.Schema.Types.ObjectId,
@@ -53,7 +61,7 @@ export const receiptSchema = new mongoose.Schema(
             required: true,
         },
         transactionDate: {
-            type: Date,
+            type: String,
         },
         transactionTime: {
             type: String,
@@ -81,9 +89,6 @@ export const receiptSchema = new mongoose.Schema(
                     type: Number,
                     required: true,
                 },
-                productCode: {
-                    type: String,
-                },
                 quantityUnit: {
                     type: String,
                 },
@@ -93,12 +98,33 @@ export const receiptSchema = new mongoose.Schema(
             type: Boolean,
             required: true,
         },
+        filePath: {
+            type: String,
+            required: true,
+        },
     },
     {
         timestamps: true,
     }
 );
 
-const ReceiptModel = mongoose.model<ReceiptDocument>("Receipt", receiptSchema);
+receiptSchema.statics.findByUserId = async function (
+    userId: string
+): Promise<ReceiptDocument[]> {
+    return this.find({ user: userId });
+};
 
-export default ReceiptModel;
+receiptSchema.methods.sanitize = function (): SanitizedReceipt {
+    const receipt = this.toObject();
+    const { __v, user, filePath, createdAt, updatedAt, ...sanitized } = receipt;
+    return sanitized;
+};
+
+export interface ReceiptModel extends mongoose.Model<ReceiptDocument> {
+    findByUserId(userId: string): Promise<ReceiptDocument[]>;
+}
+
+export default mongoose.model<ReceiptDocument, ReceiptModel>(
+    "Receipt",
+    receiptSchema
+);

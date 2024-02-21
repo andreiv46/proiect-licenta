@@ -1,7 +1,7 @@
 import multer from "multer";
 import path from "path";
 
-const createStorage = (storageName: string) => {
+export const createStorage = (storageName: string) => {
     return multer.diskStorage({
         destination: function (_req, _file, cb) {
             cb(null, `./uploads/${storageName}`);
@@ -14,6 +14,3 @@ const createStorage = (storageName: string) => {
         },
     });
 };
-
-const receiptStorage = createStorage("receipt");
-export const uploadReceipt = multer({ storage: receiptStorage });
