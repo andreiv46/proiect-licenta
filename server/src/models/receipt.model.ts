@@ -20,7 +20,7 @@ export interface Receipt {
     merchantPhoneNumber?: string;
     merchantAddress?: string;
     total: number;
-    transactionDate?: string;
+    transactionDate?: Date;
     transactionTime?: string;
     subtotal?: number;
     totalTax?: number;
@@ -61,7 +61,7 @@ export const receiptSchema = new mongoose.Schema<ReceiptDocument, ReceiptModel>(
             required: true,
         },
         transactionDate: {
-            type: String,
+            type: Date,
         },
         transactionTime: {
             type: String,

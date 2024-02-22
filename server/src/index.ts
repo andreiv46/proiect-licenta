@@ -8,6 +8,9 @@ import { errorHandler } from "./utils/errors";
 import receiptRoutes from "./routes/receipt.routes";
 import { verifyToken } from "./middlewares/validateToken";
 import { initializeFormRecognizerClient } from "./utils/form-recognizer";
+import expenseHistoryRoutes from "./routes/expense-history.routes";
+import expenseCategoryRoutes from "./routes/expense-category.routes";
+import recurringExpenseRoutes from "./routes/recurring-expense.routes";
 
 const app = express();
 
@@ -15,6 +18,9 @@ app.use(express.json())
     .use(cors())
     .use("/auth", authRoutes)
     .use("/receipt", verifyToken, receiptRoutes)
+    .use("/expense-history", verifyToken, expenseHistoryRoutes)
+    .use("/recurring-expense", verifyToken, recurringExpenseRoutes)
+    .use("/expense-category", expenseCategoryRoutes)
     .use(errorHandler);
 
 app.listen(process.env.PORT, async () => {

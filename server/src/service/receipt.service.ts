@@ -121,7 +121,7 @@ export async function analyzeReceiptForm(
         console.log("Merchant:", receipt.MerchantName?.content);
     }
     if (receipt.Total?.content) {
-        receiptInfo.total = Number(receipt.Total.content);
+        receiptInfo.total = (receipt.Total as any).value;
         console.log("Total:", receipt.Total?.content);
     }
     if (receipt.Items) {
@@ -147,21 +147,15 @@ export async function analyzeReceiptForm(
                         console.log("Description:", Description.content);
                     }
                     if (TotalPrice?.content) {
-                        itemInfo.totalPrice = parseFloat(
-                            TotalPrice.content.replace(",", ".")
-                        );
+                        itemInfo.totalPrice = (TotalPrice as any).value;
                         console.log("Total Price:", TotalPrice.content);
                     }
                     if (Quantity?.content) {
-                        itemInfo.quantity = parseFloat(
-                            Quantity.content.replace(",", ".")
-                        );
+                        itemInfo.quantity = (Quantity as any).value;
                         console.log("Quantity:", Quantity.content);
                     }
                     if (Price?.content) {
-                        itemInfo.price = parseFloat(
-                            Price.content.replace(",", ".")
-                        );
+                        itemInfo.price = (Price as any).value;
                         console.log("Price:", Price.content);
                     }
                     if (QuantityUnit?.content) {
@@ -174,23 +168,22 @@ export async function analyzeReceiptForm(
         }
     }
     if (receipt.TransactionDate?.content) {
-        receiptInfo.transactionDate = receipt.TransactionDate.content;
-        console.log("Transaction Date:", receipt.TransactionDate.content);
+        const transactionDate = new Date(
+            (receipt.TransactionDate as any).value
+        );
+        receiptInfo.transactionDate = transactionDate;
+        console.log("Transaction Date:", transactionDate);
     }
     if (receipt.TransactionTime?.content) {
         receiptInfo.transactionTime = receipt.TransactionTime.content;
         console.log("Transaction Time:", receipt.TransactionTime.content);
     }
     if (receipt.Subtotal?.content) {
-        receiptInfo.subtotal = parseFloat(
-            receipt.Subtotal.content.replace(",", ".")
-        );
+        receiptInfo.subtotal = (receipt.Subtotal as any).value;
         console.log("Subtotal:", receipt.Subtotal.content);
     }
     if (receipt.TotalTax?.content) {
-        receiptInfo.totalTax = parseFloat(
-            receipt.TotalTax.content.replace(",", ".")
-        );
+        receiptInfo.totalTax = (receipt.TotalTax as any).value;
         console.log("Total Tax:", receipt.TotalTax.content);
     }
     return receiptInfo as Receipt;

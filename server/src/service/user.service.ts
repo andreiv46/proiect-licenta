@@ -36,8 +36,17 @@ export async function authenticateUser(
     return user.sanitize();
 }
 
+export async function findUserById(id: string): Promise<UserWithoutPassword> {
+    const user = await UserModel.findById(id);
+    UserModel.watch();
+    if (!user) {
+        throw new UserNotFoundError();
+    }
+    return user.sanitize();
+}
+
 export function generateToken(payload: object): string {
     return jwt.sign(payload, process.env.JWT_SECRET_KEY!, {
-        expiresIn: "24h", // for testing purposes
+        expiresIn: "7d", // for testing purposes
     });
 }

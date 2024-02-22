@@ -9,7 +9,6 @@ import { validateFile } from "../middlewares/validateFile";
 import { createReceiptSchema } from "../schema/receipt.schema";
 import { validate } from "../middlewares/validateResource";
 import { uploadReceipt } from "../middlewares/fileUpload";
-
 import "dotenv/config";
 
 const router = Router();
