@@ -57,7 +57,7 @@ userSchema.methods.comparePassword = async function (
 };
 
 userSchema.methods.sanitize = function (): UserWithoutPassword {
-    const user = this.toObject();
+    const user: UserDocument = this.toObject();
     const sanitizedUser = {
         id: user._id,
         username: user.username,
