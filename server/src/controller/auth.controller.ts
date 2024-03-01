@@ -7,6 +7,7 @@ import {
 } from "../service/user.service";
 import { UserAlreadyExistsError } from "../errors/auth.errors";
 import { RegisterInput, LoginInput } from "../schema/user.schema";
+import { ExtendedRequest } from "../utils/types";
 
 export async function register(
     req: Request<{}, {}, RegisterInput["body"]>,
@@ -47,6 +48,18 @@ export async function login(
         const token = generateToken(payload);
 
         return res.status(200).json({ user, token });
+    } catch (error: unknown) {
+        next(error);
+    }
+}
+
+export async function getCurrentUser(
+    req: ExtendedRequest,
+    res: Response,
+    next: NextFunction
+): Promise<Response | void> {
+    try {
+        return res.status(200).json(req.user);
     } catch (error: unknown) {
         next(error);
     }

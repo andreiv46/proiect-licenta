@@ -10,18 +10,17 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-
-interface Expense {
-    _id: string;
-    amount: number;
-    description: string;
-    date: string;
-}
+import { ExpenseHistory } from "@/api/expense-history.api";
 
 const Home = () => {
     const navigate = useNavigate();
 
-    const { data, error, isError, isLoading } = useExpenseHistoryQuery();
+    const {
+        data: expenses,
+        error,
+        isError,
+        isLoading,
+    } = useExpenseHistoryQuery();
 
     if (isLoading) return <div>Loading...</div>;
     if (isError) {
@@ -43,7 +42,7 @@ const Home = () => {
                 Profile
             </Button>
             <div>
-                {data?.data.map((expense: Expense) => (
+                {(expenses ?? []).map((expense: ExpenseHistory) => (
                     <Card key={expense._id} className="w-[350px]">
                         <CardHeader>
                             <CardTitle>{expense.description}</CardTitle>

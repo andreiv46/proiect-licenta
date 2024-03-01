@@ -1,6 +1,7 @@
 import axios from "axios";
 
-const token = import.meta.env.VITE_SAMPLE_TOKEN;
+// const token = import.meta.env.VITE_SAMPLE_TOKEN;
+const token = localStorage.getItem("token");
 
 export const configureAxios = () => {
     axios.defaults.baseURL = import.meta.env.VITE_API_URL;

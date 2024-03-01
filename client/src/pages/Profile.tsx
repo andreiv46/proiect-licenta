@@ -6,7 +6,7 @@ const Profile = () => {
 
     return (
         <div>
-            <Button onClick={() => navigate("/")}>Go to Home</Button>
+            <Button onClick={() => navigate("/home")}>Go to Home</Button>
             <h1>Profile</h1>
         </div>
     );

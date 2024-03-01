@@ -4,10 +4,15 @@ import { toast } from "@/components/ui/use-toast";
 
 const handleQueryError = (error: unknown) => {
     if (axios.isAxiosError(error) && error.response?.data.message) {
+        let errorMessage = error.response?.data.message;
+        if (Array.isArray(errorMessage)) {
+            errorMessage = errorMessage.map((err) => err.message).join(" ");
+        }
+        console.log(errorMessage);
         toast({
             variant: "destructive",
             title: "Uh oh! Something went wrong.",
-            description: error.response?.data.message,
+            description: errorMessage,
         });
     } else {
         toast({
@@ -24,6 +29,10 @@ export const queryClient = new QueryClient({
             refetchOnWindowFocus: false,
             retry: 0,
             onError: handleQueryError,
+        },
+        mutations: {
+            onError: handleQueryError,
+            retry: 0,
         },
     },
 });
