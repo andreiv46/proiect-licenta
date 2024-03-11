@@ -26,8 +26,8 @@ const register = async (input: RegisterInput): Promise<User> => {
         .then((response) => response.data);
 };
 
-const getCurrentUser = async (): Promise<User> => {
-    console.log("Fetching current user");
+export const getCurrentUser = async (): Promise<User> => {
+    console.log("Fetching current userS");
     return axios.get("/auth/current").then((response) => response.data);
 };
 
@@ -43,5 +43,8 @@ export const useGetCurrentUserQuery = (): UseQueryResult<User, unknown> => {
     return useQuery<User, AxiosError>({
         queryKey: ["current-user"],
         queryFn: getCurrentUser,
+        onError: (error) => {
+            console.error(error);
+        },
     });
 };

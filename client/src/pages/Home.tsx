@@ -11,6 +11,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { ExpenseHistory } from "@/api/expense-history.api";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 const Home = () => {
     const navigate = useNavigate();
@@ -42,19 +43,25 @@ const Home = () => {
                 Profile
             </Button>
             <div>
-                {(expenses ?? []).map((expense: ExpenseHistory) => (
-                    <Card key={expense._id} className="w-[350px]">
-                        <CardHeader>
-                            <CardTitle>{expense.description}</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <CardDescription>{expense.amount}</CardDescription>
-                        </CardContent>
-                        <CardFooter>
-                            <CardDescription>{expense.date}</CardDescription>
-                        </CardFooter>
-                    </Card>
-                ))}
+                <ScrollArea className="h-[66.67vh] w-[350px] rounded-md border">
+                    {(expenses ?? []).map((expense: ExpenseHistory) => (
+                        <Card key={expense._id} className="w-[350px]">
+                            <CardHeader>
+                                <CardTitle>{expense.description}</CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                <CardDescription>
+                                    {expense.amount}
+                                </CardDescription>
+                            </CardContent>
+                            <CardFooter>
+                                <CardDescription>
+                                    {expense.date}
+                                </CardDescription>
+                            </CardFooter>
+                        </Card>
+                    ))}
+                </ScrollArea>
             </div>
         </div>
     );

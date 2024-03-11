@@ -10,6 +10,8 @@ import { configureAxios } from "./api/configureAxios";
 import { AuthProvider } from "./contexts/auth.context";
 import NavBar from "./components/NavBar";
 import ProtectedRoute from "./pages/ProtectedRoute";
+import Register from "./pages/Register";
+import ExpenseHistory from "./pages/ExpenseHistory";
 
 configureAxios();
 
@@ -24,8 +26,13 @@ const App = () => {
                         <Route element={<ProtectedRoute />}>
                             <Route path="/home" element={<Home />} />
                             <Route path="/profile" element={<Profile />} />
+                            <Route
+                                path="expense-history"
+                                element={<ExpenseHistory />}
+                            />
                         </Route>
                         <Route path="/login" element={<Login />} />
+                        <Route path="/register" element={<Register />} />
                         <Route path="*">"Not found"</Route>
                     </Routes>
                     <Toaster />

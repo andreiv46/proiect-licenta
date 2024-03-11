@@ -11,7 +11,7 @@ import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { useState } from "react";
 import { LoginInput } from "@/api/auth.api";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 
 const LoginForm = () => {
@@ -33,7 +33,7 @@ const LoginForm = () => {
     };
 
     return (
-        <Card>
+        <Card className="w-1/2">
             <CardHeader>
                 <CardTitle>Login</CardTitle>
                 <CardDescription>
@@ -45,7 +45,7 @@ const LoginForm = () => {
                     <Label htmlFor="email">Email</Label>
                     <Input
                         id="email"
-                        placeholder="m@example.com"
+                        placeholder="johndoe@gamil.com"
                         required
                         type="email"
                         onChange={(e) => {
@@ -65,7 +65,10 @@ const LoginForm = () => {
                     />
                 </div>
             </CardContent>
-            <CardFooter>
+            <CardFooter className="flex-col">
+                <Link to="/register" className="text-blue-500 mb-2">
+                    Don't have an account?
+                </Link>
                 <Button className="w-full" onClick={handleLogin}>
                     Login
                 </Button>

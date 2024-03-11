@@ -1,9 +1,10 @@
 import {
-    useGetCurrentUserQuery,
     useLoginMutation,
     useRegisterMutation,
+    getCurrentUser,
 } from "@/api/auth.api";
 import { LoginInput, RegisterInput } from "@/api/auth.api";
+import { setAxiosAuthHeader } from "@/api/configureAxios";
 import {
     createContext,
     useMemo,
@@ -15,8 +16,8 @@ import {
 
 export interface User {
     _id: string;
+    username: string;
     email: string;
-    password: string;
 }
 
 export interface LoginResponse {
@@ -40,14 +41,22 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const { mutateAsync: loginMutationAsync } = useLoginMutation();
     const { mutateAsync: registerMutationAsync } = useRegisterMutation();
     const [user, setUser] = useState<User>();
-    const [isLoading, setIsLoading] = useState<boolean>(false);
-    const { data: currentUser } = useGetCurrentUserQuery();
+    const [isLoading, setIsLoading] = useState<boolean>(true);
 
     useEffect(() => {
-        if (currentUser && !user) {
-            setUser(currentUser);
+        setIsLoading(true);
+        if (localStorage.getItem("token")) {
+            getCurrentUser()
+                .then((user) => {
+                    setUser(user);
+                })
+                .finally(() => {
+                    setIsLoading(false);
+                });
+        } else {
+            setIsLoading(false);
         }
-    }, [currentUser, user]);
+    }, []);
 
     const login = useCallback(
         async (input: LoginInput): Promise<boolean> => {
@@ -56,9 +65,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                 const response = await loginMutationAsync(input);
                 setUser(response.user);
                 localStorage.setItem("token", response.token);
+                setAxiosAuthHeader(response.token);
+                setIsLoading(false);
                 return true;
             } catch (error) {
-                console.error(error);
                 return false;
             } finally {
                 setIsLoading(false);

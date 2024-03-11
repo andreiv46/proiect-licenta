@@ -23,15 +23,26 @@ const handleQueryError = (error: unknown) => {
     }
 };
 
+const handleQuerySuccess = (data: unknown) => {
+    if (typeof data === "object" && data !== null && "message" in data) {
+        toast({
+            title: "Success!",
+            description: (data as { message: string })?.message,
+        });
+    }
+};
+
 export const queryClient = new QueryClient({
     defaultOptions: {
         queries: {
             refetchOnWindowFocus: false,
             retry: 0,
             onError: handleQueryError,
+            onSuccess: handleQuerySuccess,
         },
         mutations: {
             onError: handleQueryError,
+            onSuccess: handleQuerySuccess,
             retry: 0,
         },
     },
