@@ -12,6 +12,15 @@ import {
 } from "./ui/dropdown-menu";
 import { useEffect, useState } from "react";
 import { Avatar, AvatarImage, AvatarFallback } from "./ui/avatar";
+import {
+    Home,
+    LogIn,
+    LogOut,
+    User,
+    History,
+    AlignJustify,
+    Coins,
+} from "lucide-react";
 
 const NavBar = () => {
     const { user, logout } = useAuth();
@@ -33,20 +42,40 @@ const NavBar = () => {
     };
 
     const items = [
-        { name: "Home", to: "/home" },
-        { name: "Profile", to: "/profile" },
-        { name: "Expense History", to: "/expense-history" },
+        { name: "Home", to: "/home", icon: Home },
+        { name: "Profile", to: "/profile", icon: User },
+        { name: "Expense History", to: "/expense-history", icon: History },
+        { name: "Expenses", to: "/expenses", icon: Coins },
     ];
 
     return (
         <nav className="inset-x-0 top-0 z-50 bg-white shadow-sm translate-y-0/hidden md:translate-y-0 dark:bg-gray-950">
             <div className="container flex items-center justify-between h-14 px-4 md:px-6">
-                <Link className="h-10 w-10 bg-green-500 rounded-full" to="/">
+                <Link
+                    className="flex items-center w-auto h-10 bg-green-400 rounded-full"
+                    to="/"
+                >
                     <Avatar>
                         <AvatarImage src="/duck.png" alt="Home" />
                         <AvatarFallback>CN</AvatarFallback>
                     </Avatar>
-                    <span className="sr-only">Companie</span>
+                    <svg
+                        height="30"
+                        width="84"
+                        xmlns="http://www.w3.org/2000/svg"
+                    >
+                        <text
+                            x="0"
+                            y="22"
+                            fill="#4E8BF7"
+                            fontSize="24"
+                            fontFamily="Lily Script One"
+                            fontStyle="italic"
+                            fontWeight="900"
+                        >
+                            $pendy
+                        </text>
+                    </svg>
                 </Link>
 
                 {!isMobileView && (
@@ -58,6 +87,9 @@ const NavBar = () => {
                                 onClick={() => navigate(item.to)}
                                 variant="link"
                             >
+                                <span className="mr-2">
+                                    <item.icon className="h-4 w-4" />
+                                </span>
                                 {item.name}
                             </Button>
                         ))}
@@ -68,6 +100,9 @@ const NavBar = () => {
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                             <Button size="sm" variant="ghost">
+                                <span className="mr-2">
+                                    <AlignJustify className="h-4 w-4" />
+                                </span>
                                 Menu
                             </Button>
                         </DropdownMenuTrigger>
@@ -79,6 +114,9 @@ const NavBar = () => {
                                     key={item.name}
                                     onClick={() => navigate(item.to)}
                                 >
+                                    <span className="mr-2">
+                                        <item.icon className="h-4 w-4" />
+                                    </span>
                                     {item.name}
                                 </DropdownMenuItem>
                             ))}
@@ -97,6 +135,9 @@ const NavBar = () => {
                                 onClick={handleLogout}
                             >
                                 Logout
+                                <span className="ml-2">
+                                    <LogOut className="h-3 w-3" />
+                                </span>
                             </Button>
                         </>
                     ) : (
@@ -107,10 +148,17 @@ const NavBar = () => {
                             onClick={() => navigate("/login")}
                         >
                             Login
+                            <span className="ml-2">
+                                <LogIn className="h-3 w-3" />
+                            </span>
                         </Button>
                     )}
                 </div>
             </div>
+            <link
+                href="https://fonts.googleapis.com/css2?family=Lily+Script+One&family=Madimi+One&display=swap"
+                rel="stylesheet"
+            />
         </nav>
     );
 };

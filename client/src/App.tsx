@@ -12,6 +12,7 @@ import NavBar from "./components/NavBar";
 import ProtectedRoute from "./pages/ProtectedRoute";
 import Register from "./pages/Register";
 import ExpenseHistory from "./pages/ExpenseHistory";
+import Expenses from "./pages/Expenses";
 
 configureAxios();
 
@@ -30,6 +31,7 @@ const App = () => {
                                 path="expense-history"
                                 element={<ExpenseHistory />}
                             />
+                            <Route path="expenses" element={<Expenses />} />
                         </Route>
                         <Route path="/login" element={<Login />} />
                         <Route path="/register" element={<Register />} />

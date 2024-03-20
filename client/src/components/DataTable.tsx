@@ -54,24 +54,31 @@ export function DataTable<TData, TValue>({
         React.useState<ColumnFiltersState>([]);
     const [globalFilter, setGlobalFilter] = React.useState("");
     const [rowSelection, setRowSelection] = React.useState({});
+    const [pagination, setPagination] = React.useState({
+        pageIndex: 0, //initial page index
+        pageSize: 10, //default page size
+    });
 
     const table = useReactTable({
         data,
         columns,
         getCoreRowModel: getCoreRowModel(),
         getPaginationRowModel: getPaginationRowModel(),
+        onPaginationChange: setPagination,
         onSortingChange: setSorting,
         onColumnFiltersChange: setColumnFilters,
         getFilteredRowModel: getFilteredRowModel(),
         getSortedRowModel: getSortedRowModel(),
         onGlobalFilterChange: setGlobalFilter,
         onRowSelectionChange: setRowSelection,
+        autoResetPageIndex: false,
         globalFilterFn: fuzzyFilter,
         state: {
             sorting,
             columnFilters,
             globalFilter,
             rowSelection,
+            pagination,
         },
     });
 
@@ -137,6 +144,13 @@ export function DataTable<TData, TValue>({
                 </Table>
             </div>
             <div className="flex items-center justify-end space-x-2 py-4">
+                <span>
+                    Page{" "}
+                    <strong>
+                        {table.getState().pagination.pageIndex + 1} of{" "}
+                        {table.getPageCount()}
+                    </strong>{" "}
+                </span>
                 <Button
                     variant="outline"
                     size="sm"

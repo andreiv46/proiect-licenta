@@ -50,6 +50,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                 .then((user) => {
                     setUser(user);
                 })
+                .catch((error) => {
+                    logout();
+                    console.log(error);
+                })
                 .finally(() => {
                     setIsLoading(false);
                 });

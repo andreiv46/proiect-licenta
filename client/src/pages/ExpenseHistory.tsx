@@ -4,7 +4,13 @@ import {
 } from "@/api/expense-history.api";
 import { Column, ColumnDef } from "@tanstack/react-table";
 import { DataTable } from "@/components/DataTable";
-import { ArrowUpDown, MoreHorizontal } from "lucide-react";
+import {
+    ArrowUpDown,
+    MoreHorizontal,
+    Banknote,
+    Landmark,
+    CreditCard,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
     DropdownMenu,
@@ -15,8 +21,13 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
-
 import { Checkbox } from "@/components/ui/checkbox";
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface SortingButtonProps {
     column: Column<ExpenseHistoryType>;
@@ -39,17 +50,20 @@ const labels = [
     {
         value: "card",
         label: "Card",
-        color: "bg-blue-400",
+        icon: CreditCard,
+        color: "bg-blue-400 hover:bg-blue-500",
     },
     {
         value: "bank",
-        label: "Bank",
-        color: "bg-yellow-400",
+        label: "Bank Transfer",
+        icon: Landmark,
+        color: "bg-yellow-400 hover:bg-yellow-500",
     },
     {
         value: "cash",
         label: "Cash",
-        color: "bg-green-400",
+        icon: Banknote,
+        color: "bg-green-400 hover:bg-green-500",
     },
 ];
 
@@ -89,14 +103,26 @@ const columns: ColumnDef<ExpenseHistoryType>[] = [
         header: "Description",
         accessorKey: "description",
         cell: ({ row }) => {
-            // <div className="font-medium">{row.getValue("description")}</div>
             const label = labels[Math.floor(Math.random() * labels.length)];
             return (
                 <div className="flex space-x-2">
                     {label && (
-                        <Badge variant="secondary" className={label.color}>
-                            {label.label}
-                        </Badge>
+                        <TooltipProvider>
+                            <Tooltip>
+                                <TooltipTrigger>
+                                    <Badge
+                                        variant="secondary"
+                                        className={label.color}
+                                    >
+                                        {<label.icon />}
+                                        {/* {label.label} */}
+                                    </Badge>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                    <p>{label.label}</p>
+                                </TooltipContent>
+                            </Tooltip>
+                        </TooltipProvider>
                     )}
                     <span className="max-w-[500px] truncate font-medium">
                         {row.getValue("description")}
