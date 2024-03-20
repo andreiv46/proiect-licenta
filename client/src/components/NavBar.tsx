@@ -49,10 +49,10 @@ const NavBar = () => {
     ];
 
     return (
-        <nav className="inset-x-0 top-0 z-50 bg-white shadow-sm translate-y-0/hidden md:translate-y-0 dark:bg-gray-950">
-            <div className="container flex items-center justify-between h-14 px-4 md:px-6">
+        <nav className="inset-x-0 top-0 z-50 bg-white shadow-lg translate-y-0/hidden md:translate-y-0 dark:bg-gray-950">
+            <div className="w-full flex items-center justify-between h-16 px-4 md:px-6">
                 <Link
-                    className="flex items-center w-auto h-10 bg-green-400 rounded-full"
+                    className="flex items-center w-auto h-10 bg-slate-100 rounded-full shadow-2xl"
                     to="/"
                 >
                     <Avatar>

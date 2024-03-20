@@ -231,7 +231,7 @@ const ExpenseHistory = () => {
     }
     return (
         expenses && (
-            <div className="container mx-auto py-2 bg-green-50 shadow-2xl rounded-sm ">
+            <div className="container mx-auto py-2 shadow-2xl rounded-sm ">
                 <DataTable columns={columns} data={expenses} />
             </div>
         )

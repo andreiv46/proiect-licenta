@@ -48,6 +48,17 @@ const Register = () => {
                 </CardHeader>
                 <CardContent className="space-y-4">
                     <div className="space-y-2">
+                        <Label htmlFor="username">Username</Label>
+                        <Input
+                            id="username"
+                            required
+                            onChange={(e) => {
+                                setUsername(e.target.value);
+                            }}
+                            placeholder="JohnDoe42"
+                        />
+                    </div>
+                    <div className="space-y-2">
                         <Label htmlFor="email">Email</Label>
                         <Input
                             id="email"
@@ -68,16 +79,7 @@ const Register = () => {
                             onChange={(e) => {
                                 setPassword(e.target.value);
                             }}
-                        />
-                    </div>
-                    <div className="space-y-2">
-                        <Label htmlFor="username">Username</Label>
-                        <Input
-                            id="username"
-                            required
-                            onChange={(e) => {
-                                setUsername(e.target.value);
-                            }}
+                            placeholder="**********************"
                         />
                     </div>
                 </CardContent>
@@ -86,7 +88,7 @@ const Register = () => {
                         Already have an account?
                     </Link>
                     <Button className="w-full" onClick={handleRegister}>
-                        Login
+                        Register
                     </Button>
                 </CardFooter>
             </Card>

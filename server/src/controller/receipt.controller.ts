@@ -1,6 +1,6 @@
 import { Response, NextFunction } from "express";
 import { ExtendedRequest } from "../utils/types";
-import { CreateReceiptInput } from "../schema/receipt.schema";
+import { CreateReceiptInput, GetReceiptsInput } from "../schema/receipt.schema";
 import {
     createReceipt,
     getReceipts,
@@ -30,14 +30,19 @@ export async function createReceiptHandler(
 }
 
 export async function getReceiptsHandler(
-    req: ExtendedRequest,
+    req: ExtendedRequest<{}, {}, {}, GetReceiptsInput["query"]>,
     res: Response,
     next: NextFunction
 ): Promise<Response | void> {
     try {
         const userId = req.user?.id!;
-        const receipts = await getReceipts(userId);
-        return res.status(200).json(receipts);
+        const { limit, offset } = req.query;
+        const { receipts, total: receiptsCount } = await getReceipts(
+            userId,
+            limit,
+            offset
+        );
+        return res.status(200).json({ receipts, receiptsCount });
     } catch (error) {
         return next(error);
     }

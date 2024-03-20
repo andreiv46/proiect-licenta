@@ -90,7 +90,7 @@ export function DataTable<TData, TValue>({
                 className="p-2 font-lg shadow border border-block max-w-sm"
                 placeholder="Search all columns..."
             />
-            <div className="rounded-md border shadow-2xl bg-slate-200">
+            <div className="rounded-md border shadow-2xl ">
                 <Table>
                     <TableHeader>
                         {table.getHeaderGroups().map((headerGroup) => (

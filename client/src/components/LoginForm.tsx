@@ -62,6 +62,7 @@ const LoginForm = () => {
                         onChange={(e) => {
                             setPassword(e.target.value);
                         }}
+                        placeholder="**********************"
                     />
                 </div>
             </CardContent>

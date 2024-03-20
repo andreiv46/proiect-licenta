@@ -25,4 +25,22 @@ export const createReceiptSchema = object({
     }).strict(),
 });
 
+export const getReceiptsSchema = object({
+    query: object({
+        limit: string()
+            .transform((val) => parseInt(val))
+            .refine((val) => !isNaN(val) && val > 0, {
+                message: "Limit must be a positive number",
+            })
+            .optional(),
+        offset: string()
+            .transform((val) => parseInt(val))
+            .refine((val) => !isNaN(val) && val >= 0, {
+                message: "Offset must be a non-negative number",
+            })
+            .optional(),
+    }).strict(),
+});
+
 export type CreateReceiptInput = TypeOf<typeof createReceiptSchema>;
+export type GetReceiptsInput = TypeOf<typeof getReceiptsSchema>;

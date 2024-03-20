@@ -6,7 +6,10 @@ import {
     getReceiptHandler,
 } from "../controller/receipt.controller";
 import { validateFile } from "../middlewares/validateFile";
-import { createReceiptSchema } from "../schema/receipt.schema";
+import {
+    createReceiptSchema,
+    getReceiptsSchema,
+} from "../schema/receipt.schema";
 import { validate } from "../middlewares/validateResource";
 import { uploadReceipt } from "../middlewares/fileUpload";
 import "dotenv/config";
@@ -21,7 +24,7 @@ router
         validate(createReceiptSchema),
         createReceiptHandler
     )
-    .get("/", getReceiptsHandler)
+    .get("/", validate(getReceiptsSchema), getReceiptsHandler)
     .get("/:id", getReceiptHandler)
     .delete("/:id", deleteReceiptHandler);
 

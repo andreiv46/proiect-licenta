@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import { UserDocument } from "./user.model";
+import { fileToBase64 } from "../utils/multer";
 
 export interface ReceiptInput {
     name: string;
@@ -15,6 +16,10 @@ export interface Item {
     quantityUnit?: string;
 }
 
+export interface ItemWithId extends Item {
+    _id: string;
+}
+
 export interface Receipt {
     merchantName?: string;
     merchantPhoneNumber?: string;
@@ -28,7 +33,10 @@ export interface Receipt {
 }
 
 export interface SanitizedReceipt extends Receipt {
+    _id: string;
     analyzed: boolean;
+    base64File?: string;
+    items?: ItemWithId[];
 }
 
 export interface ReceiptDocument extends Receipt, mongoose.Document {
@@ -109,19 +117,30 @@ export const receiptSchema = new mongoose.Schema<ReceiptDocument, ReceiptModel>(
 );
 
 receiptSchema.statics.findByUserId = async function (
-    userId: string
-): Promise<ReceiptDocument[]> {
-    return this.find({ user: userId });
+    userId: string,
+    limit?: number,
+    offset?: number
+): Promise<{ receipts: ReceiptDocument[]; total: number }> {
+    const total = await this.countDocuments({ user: userId });
+    const receipts = await this.find({ user: userId })
+        .skip(offset || 0)
+        .limit(limit || 0);
+    return { receipts, total };
 };
 
 receiptSchema.methods.sanitize = function (): SanitizedReceipt {
     const receipt = this.toObject();
     const { __v, user, filePath, createdAt, updatedAt, ...sanitized } = receipt;
+    sanitized.base64File = fileToBase64(filePath);
     return sanitized;
 };
 
 export interface ReceiptModel extends mongoose.Model<ReceiptDocument> {
-    findByUserId(userId: string): Promise<ReceiptDocument[]>;
+    findByUserId(
+        userId: string,
+        limit?: number,
+        offset?: number
+    ): Promise<{ receipts: ReceiptDocument[]; total: number }>;
 }
 
 export default mongoose.model<ReceiptDocument, ReceiptModel>(

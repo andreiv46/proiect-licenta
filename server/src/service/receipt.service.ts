@@ -45,12 +45,23 @@ export async function createReceipt(
     return receipt.sanitize();
 }
 
-export async function getReceipts(userId: string): Promise<SanitizedReceipt[]> {
-    const receipts = await ReceiptModel.findByUserId(userId);
+export async function getReceipts(
+    userId: string,
+    limit?: number,
+    offset?: number
+): Promise<{ receipts: SanitizedReceipt[]; total: number }> {
+    const { receipts, total } = await ReceiptModel.findByUserId(
+        userId,
+        limit,
+        offset
+    );
     if (receipts.length === 0) {
         throw new NoReceiptsError();
     }
-    return receipts.map((receipt) => receipt.sanitize());
+    return {
+        receipts: receipts.map((receipt) => receipt.sanitize()),
+        total: total,
+    };
 }
 
 export async function deleteReceiptById(
