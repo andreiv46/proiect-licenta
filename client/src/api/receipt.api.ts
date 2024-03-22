@@ -1,8 +1,14 @@
-import { useQuery, UseQueryResult, useInfiniteQuery } from "react-query";
+import {
+    useQuery,
+    UseQueryResult,
+    useInfiniteQuery,
+    useMutation,
+    useQueryClient,
+} from "react-query";
 import axios, { AxiosResponse } from "axios";
 
 export interface Item {
-    _id?: string;
+    _id: string;
     description: string;
     price: number;
     quantity?: number;
@@ -41,8 +47,7 @@ const getReceipts = async (
     prevOffset: number;
 }> => {
     console.log("Fetching receipts");
-    console.log("Offset: ", offset, "Limit: ", limit);
-    return axios.get(`/receipt/?&limit=${limit}&offset=${offset}`).then(
+    return axios.get(`/receipt/?limit=${limit}&offset=${offset}`).then(
         (
             response: AxiosResponse<{
                 receipts: Receipt[];
@@ -55,6 +60,17 @@ const getReceipts = async (
             };
         }
     );
+};
+
+const createReceipt = async (data: FormData): Promise<Receipt> => {
+    console.log("Creating receipt");
+    return axios
+        .post("/receipt/", data, {
+            headers: {
+                "Content-Type": "multipart/form-data",
+            },
+        })
+        .then((response: AxiosResponse<Receipt>) => response.data);
 };
 
 export const useAllReceiptsQuery = (): UseQueryResult<Receipt[], unknown> => {
@@ -70,11 +86,21 @@ export const useInfiniteReceiptsQuery = () => {
         queryKey: ["receipts", 0],
         queryFn: ({ pageParam = 0 }) => getReceipts(pageParam, 6),
         getNextPageParam: (lastPage) => {
-            if (lastPage.prevOffset + 6 > lastPage.receiptsCount) {
+            if (lastPage.prevOffset + 6 >= lastPage.receiptsCount) {
                 return false;
             }
             return lastPage.prevOffset + 6;
         },
         staleTime: 1000 * 60 * 5,
+    });
+};
+
+export const useCreateReceiptMutation = () => {
+    const queryClient = useQueryClient();
+
+    return useMutation<Receipt, unknown, FormData, unknown>(createReceipt, {
+        onSuccess: () => {
+            queryClient.invalidateQueries("receipts");
+        },
     });
 };

@@ -1,12 +1,13 @@
 import { Outlet, Navigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
+import { Loader } from "lucide-react";
 
 const ProtectedRoute = () => {
     const { user, isLoading } = useAuth();
     const token = localStorage.getItem("token");
 
     if (isLoading) {
-        return <div>Loading...</div>;
+        return <Loader className="m-auto" />;
     }
 
     if (!user && !token) {

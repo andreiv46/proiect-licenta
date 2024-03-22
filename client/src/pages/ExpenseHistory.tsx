@@ -10,6 +10,7 @@ import {
     Banknote,
     Landmark,
     CreditCard,
+    Loader,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -225,10 +226,12 @@ const columns: ColumnDef<ExpenseHistoryType>[] = [
 
 const ExpenseHistory = () => {
     const { data: expenses, isError, isLoading } = useExpenseHistoryQuery();
-    if (isLoading) return <div>Loading...</div>;
+
+    if (isLoading) return <Loader />;
     if (isError) {
         return <div>Couldn't load expenses</div>;
     }
+
     return (
         expenses && (
             <div className="container mx-auto py-2 shadow-2xl rounded-sm ">

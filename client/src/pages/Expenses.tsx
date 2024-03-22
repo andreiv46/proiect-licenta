@@ -8,8 +8,11 @@ import {
     CardTitle,
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ReceiptText, CalendarRange, Store, Pencil } from "lucide-react";
-import { Item, useInfiniteReceiptsQuery } from "@/api/receipt.api";
+import {
+    Item,
+    useInfiniteReceiptsQuery,
+    useCreateReceiptMutation,
+} from "@/api/receipt.api";
 import InfiniteScroll from "react-infinite-scroll-component";
 import {
     Dialog,
@@ -31,6 +34,19 @@ import {
     TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { useState } from "react";
+import { Checkbox } from "@/components/ui/checkbox";
+import { useToast } from "@/components/ui/use-toast";
+import {
+    ReceiptText,
+    CalendarRange,
+    Store,
+    Pencil,
+    Loader,
+    Upload,
+} from "lucide-react";
 
 const ItemsTable = ({ items }: { items: Item[] }) => {
     return (
@@ -55,6 +71,148 @@ const ItemsTable = ({ items }: { items: Item[] }) => {
                 ))}
             </TableBody>
         </Table>
+    );
+};
+
+const AddReceipt = () => {
+    const [receiptName, setReceiptName] = useState("");
+    const [receiptTotal, setReceiptTotal] = useState(0);
+    const [analyzeReceipt, setAnalyzeReceipt] = useState(false);
+    const [file, setFile] = useState<File | null>(null);
+    const toast = useToast();
+    const {
+        mutateAsync: createReceiptMutation,
+        isLoading: createReceiptIsLoading,
+    } = useCreateReceiptMutation();
+    const [dialogOpen, setDialogOpen] = useState(false);
+
+    const hadleUpload = async () => {
+        if (receiptName.trim() === "") {
+            toast.toast({
+                variant: "destructive",
+                title: "Name is required",
+            });
+            return;
+        }
+        if (receiptTotal <= 0) {
+            toast.toast({
+                variant: "destructive",
+                title: "Total must be greater than 0",
+            });
+            return;
+        }
+        if (!file) {
+            toast.toast({
+                variant: "destructive",
+                title: "File is required",
+            });
+            return;
+        }
+        const formData = new FormData();
+        formData.append("name", receiptName);
+        formData.append("total", receiptTotal.toString());
+        formData.append("analyzeReceipt", analyzeReceipt.toString());
+        formData.append("receipt", file);
+        const response = await createReceiptMutation(formData);
+        if (response) {
+            console.log(response);
+            toast.toast({
+                title: "Receipt created",
+            });
+        }
+        setDialogOpen(false);
+    };
+
+    return (
+        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+            <DialogTrigger asChild>
+                <Button className="flex justify-center">
+                    <Pencil className="h-4 w-4 mr-2" />
+                    Add Receipt
+                </Button>
+            </DialogTrigger>
+            <DialogContent>
+                <DialogHeader>
+                    <DialogTitle>Add Receipt</DialogTitle>
+                </DialogHeader>
+                <DialogDescription>
+                    Upload and analyze your receipt
+                </DialogDescription>
+                <div className="grid gap-4 py-4">
+                    <div className="grid grid-cols-4 items-center gap-4">
+                        <Label htmlFor="name" className="text-right">
+                            Name
+                        </Label>
+                        <Input
+                            id="name"
+                            className="col-span-3"
+                            onChange={(e) => setReceiptName(e.target.value)}
+                        />
+                    </div>
+                    <div className="grid grid-cols-4 items-center gap-4">
+                        <Label htmlFor="total" className="text-right">
+                            Total
+                        </Label>
+                        <Input
+                            id="total"
+                            className="col-span-3"
+                            type="number"
+                            min="0"
+                            onChange={(e) => {
+                                const value = parseFloat(e.target.value);
+                                if (value >= 0) {
+                                    setReceiptTotal(value);
+                                }
+                            }}
+                        />
+                    </div>
+                    <div className="grid grid-cols-4 items-center gap-4">
+                        <Label htmlFor="analyze" className="text-right">
+                            Analyze
+                        </Label>
+                        <Checkbox
+                            id="analyze"
+                            className="col-span-3"
+                            checked={analyzeReceipt}
+                            onCheckedChange={(checked) => {
+                                if (typeof checked === "boolean") {
+                                    setAnalyzeReceipt(checked);
+                                }
+                            }}
+                        />
+                    </div>
+                    <div className="grid grid-cols-4 items-center gap-4">
+                        <Label htmlFor="file" className="text-right">
+                            Receipt
+                        </Label>
+                        <Input
+                            id="file"
+                            className="col-span-3"
+                            type="file"
+                            accept=".png, .jpeg .jpg"
+                            onChange={(e) => {
+                                if (e.target.files) {
+                                    setFile(e.target.files[0]);
+                                }
+                            }}
+                        />
+                    </div>
+                </div>
+                <DialogFooter>
+                    <Button
+                        className="flex justify-center"
+                        onClick={hadleUpload}
+                    >
+                        {createReceiptIsLoading ? (
+                            <Loader className="mr-2 h-4 w-4" />
+                        ) : (
+                            <Upload className="mr-2 h-4 w-4" />
+                        )}
+                        Upload
+                    </Button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
     );
 };
 
@@ -209,6 +367,7 @@ const Expenses = () => {
                             <CardTitle>Your receipts</CardTitle>
                             <CardDescription>
                                 Here are all your receipts
+                                <AddReceipt />
                             </CardDescription>
                         </CardHeader>
                         <CardContent className="space-y-2">

@@ -123,6 +123,7 @@ receiptSchema.statics.findByUserId = async function (
 ): Promise<{ receipts: ReceiptDocument[]; total: number }> {
     const total = await this.countDocuments({ user: userId });
     const receipts = await this.find({ user: userId })
+        .sort({ createdAt: -1 })
         .skip(offset || 0)
         .limit(limit || 0);
     return { receipts, total };
