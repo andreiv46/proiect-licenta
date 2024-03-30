@@ -11,6 +11,7 @@ import { initializeFormRecognizerClient } from "./utils/form-recognizer";
 import expenseHistoryRoutes from "./routes/expense-history.routes";
 import expenseCategoryRoutes from "./routes/expense-category.routes";
 import recurringExpenseRoutes from "./routes/recurring-expense.routes";
+import friendRoutes from "./routes/friend.routes";
 
 const app = express();
 
@@ -21,6 +22,7 @@ app.use(express.json())
     .use("/expense-history", verifyToken, expenseHistoryRoutes)
     .use("/recurring-expense", verifyToken, recurringExpenseRoutes)
     .use("/expense-category", expenseCategoryRoutes)
+    .use("/friend", verifyToken, friendRoutes)
     .use(errorHandler);
 
 app.listen(process.env.PORT, async () => {

@@ -16,6 +16,7 @@ export type UserWithoutPassword = {
 export interface UserDocument extends UserInput, mongoose.Document {
     createdAt: Date;
     updatedAt: Date;
+    friends: mongoose.Types.ObjectId[];
     comparePassword(userPassword: string): Promise<boolean>;
     sanitize(): UserWithoutPassword;
 }
@@ -36,6 +37,12 @@ const userSchema = new mongoose.Schema(
             type: String,
             required: true,
         },
+        friends: [
+            {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "User",
+            },
+        ],
     },
     {
         timestamps: true,

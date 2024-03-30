@@ -13,6 +13,7 @@ import {
     useInfiniteReceiptsQuery,
     useCreateReceiptMutation,
 } from "@/api/receipt.api";
+import { useRecurringExpenses } from "@/api/recurring-expense.api";
 import InfiniteScroll from "react-infinite-scroll-component";
 import {
     Dialog,
@@ -39,6 +40,8 @@ import { Label } from "@/components/ui/label";
 import { useState } from "react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/components/ui/use-toast";
+import dayGridPlugin from "@fullcalendar/daygrid";
+import FullCalendar from "@fullcalendar/react";
 import {
     ReceiptText,
     CalendarRange,
@@ -47,6 +50,7 @@ import {
     Loader,
     Upload,
 } from "lucide-react";
+import { Logo } from "@/components/Logo";
 
 const ItemsTable = ({ items }: { items: Item[] }) => {
     return (
@@ -167,21 +171,6 @@ const AddReceipt = () => {
                         />
                     </div>
                     <div className="grid grid-cols-4 items-center gap-4">
-                        <Label htmlFor="analyze" className="text-right">
-                            Analyze
-                        </Label>
-                        <Checkbox
-                            id="analyze"
-                            className="col-span-3"
-                            checked={analyzeReceipt}
-                            onCheckedChange={(checked) => {
-                                if (typeof checked === "boolean") {
-                                    setAnalyzeReceipt(checked);
-                                }
-                            }}
-                        />
-                    </div>
-                    <div className="grid grid-cols-4 items-center gap-4">
                         <Label htmlFor="file" className="text-right">
                             Receipt
                         </Label>
@@ -189,7 +178,7 @@ const AddReceipt = () => {
                             id="file"
                             className="col-span-3"
                             type="file"
-                            accept=".png, .jpeg .jpg"
+                            accept=".png, .jpeg, .jpg,"
                             onChange={(e) => {
                                 if (e.target.files) {
                                     setFile(e.target.files[0]);
@@ -197,6 +186,21 @@ const AddReceipt = () => {
                             }}
                         />
                     </div>
+                </div>
+                <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="analyze" className="text-right">
+                        Analyze
+                    </Label>
+                    <Checkbox
+                        id="analyze"
+                        className="col-span-3"
+                        checked={analyzeReceipt}
+                        onCheckedChange={(checked) => {
+                            if (typeof checked === "boolean") {
+                                setAnalyzeReceipt(checked);
+                            }
+                        }}
+                    />
                 </div>
                 <DialogFooter>
                     <Button
@@ -343,6 +347,38 @@ const Receipts = () => {
     );
 };
 
+const RecurringPayments = () => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const handleDateClick = (arg: any) => {
+        alert(arg.event.id);
+    };
+    const { data: recurringExpenses, isLoading } = useRecurringExpenses();
+    if (isLoading) return <div>Loading...</div>;
+    if (!recurringExpenses) return <div>No recurring expenses found</div>;
+
+    return (
+        recurringExpenses && (
+            <div>
+                <FullCalendar
+                    plugins={[dayGridPlugin]}
+                    initialView="dayGridMonth"
+                    events={recurringExpenses.map((expense) => ({
+                        title: `${expense.name} - ${expense.amount}`,
+                        date: expense.nextPaymentDate,
+                        id: expense._id,
+                        className:
+                            "cursor-pointer whitespace-normal overflow-hidden overflow-ellipsis w-full",
+                    }))}
+                    eventClick={handleDateClick}
+                    displayEventTime={false}
+                    dayMaxEventRows={4}
+                    aspectRatio={1.8}
+                />
+            </div>
+        )
+    );
+};
+
 const Expenses = () => {
     return (
         <div className="flex justify-center mt-2">
@@ -374,25 +410,7 @@ const Expenses = () => {
                             <Receipts />
                         </CardContent>
                         <CardFooter>
-                            <div>
-                                <svg
-                                    height="30"
-                                    width="200"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                >
-                                    <text
-                                        x="5"
-                                        y="15"
-                                        fill="#4E8BF7"
-                                        fontSize="20"
-                                        fontFamily="Lily Script One"
-                                        fontStyle="italic"
-                                        fontWeight="900"
-                                    >
-                                        $pendy
-                                    </text>
-                                </svg>
-                            </div>
+                            <Logo />
                         </CardFooter>
                     </Card>
                 </TabsContent>
@@ -405,7 +423,7 @@ const Expenses = () => {
                             </CardDescription>
                         </CardHeader>
                         <CardContent className="space-y-2">
-                            <div>test</div>
+                            <RecurringPayments />
                         </CardContent>
                         <CardFooter>
                             <Button>idk</Button>

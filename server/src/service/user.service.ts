@@ -50,3 +50,4 @@ export function generateToken(payload: object): string {
         expiresIn: "7d", // for testing purposes
     });
 }
+

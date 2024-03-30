@@ -116,7 +116,6 @@ const columns: ColumnDef<ExpenseHistoryType>[] = [
                                         className={label.color}
                                     >
                                         {<label.icon />}
-                                        {/* {label.label} */}
                                     </Badge>
                                 </TooltipTrigger>
                                 <TooltipContent>
@@ -145,7 +144,7 @@ const columns: ColumnDef<ExpenseHistoryType>[] = [
             const amount = parseFloat(row.getValue("amount"));
             const formatted = new Intl.NumberFormat("en-US", {
                 style: "currency",
-                currency: "USD",
+                currency: "RON",
             }).format(amount);
 
             return <div className="text-right font-medium">{formatted}</div>;
