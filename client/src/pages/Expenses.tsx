@@ -208,7 +208,7 @@ const AddReceipt = () => {
                         onClick={hadleUpload}
                     >
                         {createReceiptIsLoading ? (
-                            <Loader className="mr-2 h-4 w-4" />
+                            <Loader className="mr-2 h-4 w-4 animate-spin" />
                         ) : (
                             <Upload className="mr-2 h-4 w-4" />
                         )}
@@ -238,7 +238,7 @@ const Receipts = () => {
                     dataLength={receipts ? receipts.length : 0}
                     next={() => fetchNextPage()}
                     hasMore={hasNextPage || false}
-                    loader={<div>Loading...</div>}
+                    loader={<Loader className="h-12 w-12 animate-spin" />}
                 >
                     {receipts?.map((receipt) => (
                         <div
@@ -353,7 +353,7 @@ const RecurringPayments = () => {
         alert(arg.event.id);
     };
     const { data: recurringExpenses, isLoading } = useRecurringExpenses();
-    if (isLoading) return <div>Loading...</div>;
+    if (isLoading) return <Loader className="animate-spin" />;
     if (!recurringExpenses) return <div>No recurring expenses found</div>;
 
     return (

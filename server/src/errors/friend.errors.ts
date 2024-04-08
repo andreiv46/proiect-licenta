@@ -14,7 +14,7 @@ export class FriendRequestCreationError extends CustomError {
 
 export class FriendRequestAlreadyExistsError extends CustomError {
     constructor(message = "Friend request already exists") {
-        super(message, 400);
+        super(message, 409);
     }
 }
 
@@ -26,6 +26,6 @@ export class FriendRequestNotFound extends CustomError {
 
 export class FriendAlreadyExistsError extends CustomError {
     constructor(message = "Friend already exists") {
-        super(message, 400);
+        super(message, 409);
     }
 }

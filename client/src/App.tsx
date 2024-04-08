@@ -14,6 +14,7 @@ import Register from "./pages/Register";
 import ExpenseHistory from "./pages/ExpenseHistory";
 import Expenses from "./pages/Expenses";
 import Analytics from "./pages/Analytics";
+import SharedExpenses from "./pages/SharedExpenses";
 
 configureAxios();
 
@@ -34,6 +35,10 @@ const App = () => {
                             />
                             <Route path="expenses" element={<Expenses />} />
                             <Route path="analytics" element={<Analytics />} />
+                            <Route
+                                path="shared-expenses"
+                                element={<SharedExpenses />}
+                            />
                         </Route>
                         <Route path="/login" element={<Login />} />
                         <Route path="/register" element={<Register />} />

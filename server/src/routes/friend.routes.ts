@@ -5,11 +5,13 @@ import {
     getFriendRequestsHandler,
     acceptFriendRequestHandler,
     rejectFriendRequestHandler,
+    getFriendsHandler,
 } from "../controller/friend.controller";
 
 const router = Router();
 
 router
+    .get("/", getFriendsHandler)
     .get("/requests", getFriendRequestsHandler)
     .get("/find", findFriendHandler)
     .post("/add", addFriendHandler)

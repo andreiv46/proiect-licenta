@@ -6,6 +6,7 @@ import {
     getFriendRequests,
     acceptFriendRequest,
     rejectFriendRequest,
+    getFriends,
 } from "../service/friend.service";
 import { SelfFriendshipError } from "../errors/friend.errors";
 
@@ -20,7 +21,11 @@ export async function findFriendHandler(
             throw new SelfFriendshipError();
         }
         const user = await findFriendByUsername(username);
-        return res.status(200).json(user);
+        const userPendingFriendRequests = await getFriendRequests(user?.id!);
+        const isFriendRequestSent = userPendingFriendRequests.some(
+            (request) => request.sender._id.toString() === req.user?.id
+        );
+        return res.status(200).json({ ...user, isFriendRequestSent });
     } catch (error) {
         return next(error);
     }
@@ -79,6 +84,19 @@ export async function rejectFriendRequestHandler(
         const { requestId } = req.params;
         await rejectFriendRequest(req.user?.id!, requestId);
         return res.status(200).json({ message: "Friend request rejected" });
+    } catch (error) {
+        return next(error);
+    }
+}
+
+export async function getFriendsHandler(
+    req: ExtendedRequest,
+    res: Response,
+    next: NextFunction
+): Promise<Response | void> {
+    try {
+        const friends = await getFriends(req.user?.id!);
+        return res.status(200).json(friends);
     } catch (error) {
         return next(error);
     }

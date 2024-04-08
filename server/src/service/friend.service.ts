@@ -42,9 +42,18 @@ export async function createFriendRequest(
     }
 
     const existingFriendRequest = await FriendRequestModel.findOne({
-        sender: senderId,
-        recipient: recipientUser.id,
-        status: "pending",
+        $or: [
+            {
+                sender: senderId,
+                recipient: recipientUser.id,
+                status: "pending",
+            },
+            {
+                sender: recipientUser.id,
+                recipient: senderId,
+                status: "pending",
+            },
+        ],
     });
     if (existingFriendRequest) {
         throw new FriendRequestAlreadyExistsError();
@@ -128,4 +137,15 @@ export async function rejectFriendRequest(
     await FriendRequestModel.findByIdAndUpdate(requestId, {
         status: "rejected",
     });
+}
+
+export async function getFriends(userId: string) {
+    const user = await UserModel.findById(userId).populate("friends", [
+        "username",
+        "_id",
+    ]);
+    if (!user) {
+        throw new UserNotFoundError();
+    }
+    return user.friends;
 }

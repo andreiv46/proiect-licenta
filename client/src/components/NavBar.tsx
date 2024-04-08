@@ -21,6 +21,7 @@ import {
     AlignJustify,
     Coins,
     BarChart3,
+    Users,
 } from "lucide-react";
 
 const NavBar = () => {
@@ -45,8 +46,9 @@ const NavBar = () => {
     const items = [
         { name: "Home", to: "/home", icon: Home },
         { name: "Profile", to: "/profile", icon: User },
-        { name: "Expense History", to: "/expense-history", icon: History },
+        { name: "History", to: "/expense-history", icon: History },
         { name: "Expenses", to: "/expenses", icon: Coins },
+        { name: "Shared Expenses", to: "/shared-expenses", icon: Users},
         { name: "Analytics", to: "/analytics", icon: BarChart3 },
     ];
 

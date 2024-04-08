@@ -12,6 +12,7 @@ import expenseHistoryRoutes from "./routes/expense-history.routes";
 import expenseCategoryRoutes from "./routes/expense-category.routes";
 import recurringExpenseRoutes from "./routes/recurring-expense.routes";
 import friendRoutes from "./routes/friend.routes";
+import sharedExpenseRouter from "./routes/shared-expense.routes";
 
 const app = express();
 
@@ -23,6 +24,7 @@ app.use(express.json())
     .use("/recurring-expense", verifyToken, recurringExpenseRoutes)
     .use("/expense-category", expenseCategoryRoutes)
     .use("/friend", verifyToken, friendRoutes)
+    .use("/shared-expense", verifyToken, sharedExpenseRouter)
     .use(errorHandler);
 
 app.listen(process.env.PORT, async () => {

@@ -1,6 +1,11 @@
 import mongoose from "mongoose";
 import { UserDocument } from "./user.model";
 
+export interface Friend {
+    username: string;
+    _id: string;
+}
+
 export interface FriendRequest {
     sender: UserDocument["_id"];
     recipient: UserDocument["_id"];

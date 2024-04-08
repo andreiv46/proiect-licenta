@@ -7,7 +7,7 @@ const ProtectedRoute = () => {
     const token = localStorage.getItem("token");
 
     if (isLoading) {
-        return <Loader className="m-auto" />;
+        return <Loader className="m-auto animate-spin" />;
     }
 
     if (!user && !token) {
