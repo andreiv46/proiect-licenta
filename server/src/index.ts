@@ -13,6 +13,8 @@ import expenseCategoryRoutes from "./routes/expense-category.routes";
 import recurringExpenseRoutes from "./routes/recurring-expense.routes";
 import friendRoutes from "./routes/friend.routes";
 import sharedExpenseRouter from "./routes/shared-expense.routes";
+import analyticsRoutes from "./routes/analytics.routes";
+import { configurescheduledJobs } from "./scheduled-jobs/scheduled-jobs.config";
 
 const app = express();
 
@@ -25,10 +27,12 @@ app.use(express.json())
     .use("/expense-category", expenseCategoryRoutes)
     .use("/friend", verifyToken, friendRoutes)
     .use("/shared-expense", verifyToken, sharedExpenseRouter)
+    .use("/analytics", verifyToken, analyticsRoutes)
     .use(errorHandler);
 
 app.listen(process.env.PORT, async () => {
     logger.info(`Server is running on localhost:${process.env.PORT}`);
     await connect();
     await initializeFormRecognizerClient();
+    configurescheduledJobs();
 });

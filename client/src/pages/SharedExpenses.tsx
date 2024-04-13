@@ -16,6 +16,8 @@ import {
     UserRoundPlus,
     Loader,
     UserRoundSearch,
+    CalendarDays,
+    UserRoundMinus,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -28,6 +30,15 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { MoreHorizontal, AlertCircle } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { ReactNode, useState, useEffect } from "react";
 import {
@@ -41,25 +52,27 @@ import {
 } from "@/api/friend.api";
 import {
     UserSharedExpense,
-    SharedExpense,
     SharedExpenseFriend,
-    SharedExpenseUser,
     useSharedExpensesQuery,
 } from "@/api/shared-expense.api";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/hooks/useAuth";
+import { Logo } from "@/components/Logo";
+import { cn } from "@/lib/utils";
 
 const FriendSection = ({
     title,
     children,
+    className,
 }: {
     title: string;
     children: ReactNode;
+    className?: string;
 }) => (
     <div>
-        <h2>{title}</h2>
-        <div className="space-y-2 mt-2">{children}</div>
+        <h1 className="text-center">{title}</h1>
+        <div className={cn("space-y-2 mt-2", className)}>{children}</div>
     </div>
 );
 
@@ -73,9 +86,31 @@ const CurrentFriends = () => {
     if (!friends) return <div>No friends</div>;
 
     return (
-        <FriendSection title="Current Friends">
+        <FriendSection
+            title="Current Friends"
+            className="rounded-lg shadow-2xl border-2 border-gray-300 p-1"
+        >
             {friends.map((friend) => (
-                <FriendItem key={friend._id} friend={friend} />
+                <div>
+                    <div className="flex items-center justify-between space-x-4">
+                        <div className="flex items-center space-x-4">
+                            <FriendItem key={friend._id} friend={friend} />
+                        </div>
+                        <div className="flex items-center space-x-4">
+                            <Button
+                                size="sm"
+                                variant="destructive"
+                                className="w-full"
+                            >
+                                <UserRoundMinus
+                                    size="16"
+                                    className="text-red-300"
+                                />
+                            </Button>
+                        </div>
+                    </div>
+                    <Separator className="mt-4 bg-slate-300" />
+                </div>
             ))}
         </FriendSection>
     );
@@ -248,36 +283,86 @@ const SharedExpenseCard = ({
     sharedExpense: UserSharedExpense;
 }) => {
     const { user } = useAuth();
+    const [isClicked, setIsClicked] = useState<boolean>(false);
 
     const date = new Date(sharedExpense.sharedExpense.nextPaymentDate);
     const nextPaymentDate = date.toLocaleDateString(navigator.language);
+    const timeLeft =
+        Math.round(
+            (date.getTime() - new Date().getTime()) / (1000 * 3600 * 24)
+        ) + 1;
+
+    const sharedExpenseSum =
+        sharedExpense.sharedExpense.totalAmount -
+        sharedExpense.sharedExpense.ownerAmount -
+        sharedExpense.sharedExpense.friends.reduce(
+            (acc, friend) => acc + friend.amount,
+            0
+        );
 
     return (
         <Card className="border-2 border-gray-300 bg-white">
             <CardHeader>
                 <CardTitle>
-                    {sharedExpense.sharedExpense.name}
+                    <div className="flex items-center justify-between space-x-4">
+                        {sharedExpense.sharedExpense.name}
+                        {sharedExpense.isOwner && (
+                            <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                    <Button
+                                        variant="ghost"
+                                        className="h-8 w-8 p-0"
+                                    >
+                                        <span className="sr-only">
+                                            Open menu
+                                        </span>
+                                        <MoreHorizontal className="h-4 w-4" />
+                                    </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end">
+                                    <DropdownMenuLabel>
+                                        Actions
+                                    </DropdownMenuLabel>
+                                    <DropdownMenuItem
+                                        onClick={() =>
+                                            console.log("Edit shared expense")
+                                        }
+                                    >
+                                        Edit
+                                    </DropdownMenuItem>
+                                    <DropdownMenuSeparator />
+                                    <DropdownMenuItem>Delete</DropdownMenuItem>
+                                </DropdownMenuContent>
+                            </DropdownMenu>
+                        )}
+                    </div>
                     <br />
-
-                    <Badge className="text-white mr-1">
+                    <Badge className="text-white mr-1 text-lg">
                         {sharedExpense.sharedExpense.totalAmount} $
                     </Badge>
-                    {sharedExpense.sharedExpense.totalAmount -
-                        sharedExpense.sharedExpense.ownerAmount -
-                        sharedExpense.sharedExpense.friends.reduce(
-                            (acc, friend) => acc + friend.amount,
-                            0
-                        ) >
-                        0 && (
-                        <Badge className="text-white" variant={"destructive"}>
+                    {sharedExpenseSum > 0 && (
+                        <Badge
+                            className="text-white text-lg"
+                            variant={"destructive"}
+                        >
+                            <AlertCircle className="h-4 w-4 mr-1" />
                             Total amount not covered
                         </Badge>
                     )}
                 </CardTitle>
                 <CardDescription>
-                    {sharedExpense.sharedExpense.description}
-                    <br />
-                    Next payment: {nextPaymentDate}
+                    <div className="flex items-center justify-between space-x-4">
+                        {sharedExpense.sharedExpense.description}
+                        <div className="flex flex-col items-center">
+                            <p>Next payment</p>
+                            <b className="text-2xl text-slate-950">
+                                {nextPaymentDate}
+                            </b>
+                            <Badge variant={"destructive"}>
+                                {timeLeft} days left
+                            </Badge>
+                        </div>
+                    </div>
                 </CardDescription>
             </CardHeader>
             <CardContent>
@@ -291,7 +376,19 @@ const SharedExpenseCard = ({
                         defaultValue="not set"
                         readOnly
                     />
-                    <Button variant="secondary" className="shrink-0">
+                    <Button
+                        variant="secondary"
+                        className={`shrink-0 ${
+                            isClicked ? "animate-ping" : ""
+                        }`}
+                        onClick={() => {
+                            navigator.clipboard.writeText(
+                                sharedExpense.sharedExpense.paymentInfo || ""
+                            );
+                            setIsClicked(true);
+                            setTimeout(() => setIsClicked(false), 500);
+                        }}
+                    >
                         Copy
                     </Button>
                 </div>
@@ -320,28 +417,33 @@ const SharedExpenseCard = ({
                                         </div>
                                         <p className="text-sm text-muted-foreground">
                                             User share:{" "}
-                                            {
-                                                sharedExpense.sharedExpense
-                                                    .ownerAmount
-                                            }
-                                            $
+                                            <b>
+                                                {
+                                                    sharedExpense.sharedExpense
+                                                        .ownerAmount
+                                                }
+                                                $
+                                            </b>
                                         </p>
                                     </div>
                                 </div>
                                 {sharedExpense.isOwner && (
-                                    <Select defaultValue="edit">
+                                    <Select
+                                        defaultValue={
+                                            sharedExpense.notify
+                                                ? "notify"
+                                                : "do-not-notify"
+                                        }
+                                    >
                                         <SelectTrigger className="ml-auto w-[110px]">
                                             <SelectValue placeholder="Select" />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            <SelectItem value="edit">
-                                                Can edit
+                                            <SelectItem value="notify">
+                                                Notify me
                                             </SelectItem>
-                                            <SelectItem value="view">
-                                                Can view
-                                            </SelectItem>
-                                            <SelectItem value="delete">
-                                                Delete
+                                            <SelectItem value="do-not-notify">
+                                                Do not notify me
                                             </SelectItem>
                                         </SelectContent>
                                     </Select>
@@ -361,7 +463,8 @@ const SharedExpenseCard = ({
                                                 {friend.user.username}
                                             </p>
                                             <p className="text-sm text-muted-foreground">
-                                                User share: {friend.amount}$
+                                                User share:{" "}
+                                                <b>{friend.amount}$</b>
                                             </p>
                                         </div>
                                     </div>
@@ -389,6 +492,33 @@ const SharedExpenseCard = ({
                                     )}
                                 </div>
                             )
+                        )}
+                        {sharedExpense.isOwner ? (
+                            <>
+                                <Separator className="mt-4" />
+                                <div className="flex items-center justify-between space-x-4">
+                                    <Logo />
+                                    {sharedExpenseSum > 0 ? (
+                                        <Button variant={"secondary"}>
+                                            Invite friends
+                                        </Button>
+                                    ) : (
+                                        <Button disabled variant={"secondary"}>
+                                            Invite friends
+                                        </Button>
+                                    )}
+                                </div>
+                            </>
+                        ) : (
+                            <>
+                                <Separator className="mt-4" />
+                                <div className="flex items-center justify-between space-x-4">
+                                    <Logo />
+                                    <Button variant={"destructive"}>
+                                        Leave group
+                                    </Button>
+                                </div>
+                            </>
                         )}
                     </div>
                 </div>
@@ -442,11 +572,13 @@ const SharedExpenses = () => {
                 <TabsContent value="shared-payments">
                     <Card>
                         <CardHeader>
-                            <CardTitle>Shared Payments</CardTitle>
-                            <CardDescription>
-                                Here are all your shared payments
-                                {/* <AddReceipt /> */}
-                            </CardDescription>
+                            <div className="flex items-center justify-between space-x-4">
+                                <CardTitle>Group Payment Manager</CardTitle>
+                                <Button variant="outline">
+                                    <CalendarDays className="h-4 w-4 mr-1" />
+                                    View On Calendar
+                                </Button>
+                            </div>
                         </CardHeader>
                         <CardContent className="space-y-2">
                             <SharedExpensesContent />
@@ -456,14 +588,9 @@ const SharedExpenses = () => {
                 </TabsContent>
                 <TabsContent value="friends">
                     <Card className="min-h-80">
-                        <CardHeader>
-                            <CardTitle>Friends</CardTitle>
-                            <CardDescription>Your friends</CardDescription>
-                        </CardHeader>
                         <CardContent className="space-y-2">
                             <Friends />
                         </CardContent>
-                        <CardFooter>{/* <Button>idk</Button> */}</CardFooter>
                     </Card>
                 </TabsContent>
             </Tabs>

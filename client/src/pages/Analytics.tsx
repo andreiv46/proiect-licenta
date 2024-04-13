@@ -6,12 +6,61 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card";
-// import { CalendarDateRangePicker } from "@/components/ui/calendar-date-range-picker";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Overview } from "@/components/Overview";
-import { DollarSign } from "lucide-react";
+import { DollarSign, Loader } from "lucide-react";
+import {
+    PersonalPaymentsOverview,
+    usePersonalPaymentsOverviewQuery,
+} from "@/api/analytics.api";
+
+const increasedPercentage = (
+    current: number = 0,
+    previous: number = 0
+): number => {
+    if (previous === 0) {
+        return 100;
+    }
+    return ((current - previous) / previous) * 100;
+};
+
+const renderPersonalPaymentChange = (
+    personalPaymentsOverview: PersonalPaymentsOverview,
+    personalPaymentPercentageChange: number
+) => {
+    const monthYear1 = `${personalPaymentsOverview?.lastSixMonths[0].month}/${personalPaymentsOverview?.lastSixMonths[0].year}`;
+    const monthYear2 = `${personalPaymentsOverview?.lastSixMonths[1].month}/${personalPaymentsOverview?.lastSixMonths[1].year}`;
+    const change = personalPaymentPercentageChange.toFixed(2);
+    const moreOrLess = personalPaymentPercentageChange > 0 ? "more" : "less";
+
+    return (
+        <>
+            In {monthYear1}, you spent {change}% {moreOrLess} than in{" "}
+            {monthYear2}
+        </>
+    );
+};
 
 const Analytics = () => {
+    const {
+        data: personalPaymentsOverview,
+        isLoading,
+        isError,
+    } = usePersonalPaymentsOverviewQuery();
+
+    if (isLoading) {
+        return <Loader className="animate-spin" />;
+    }
+
+    if (isError) {
+        return <div>Internal server error</div>;
+    }
+
+    const personalPaymentPercentageChange = increasedPercentage(
+        personalPaymentsOverview?.lastSixMonths[0].total,
+        personalPaymentsOverview?.lastSixMonths[1].total
+    );
+
     return (
         <>
             <div className="flex-col md:flex">
@@ -21,21 +70,14 @@ const Analytics = () => {
                             Dashboard
                         </h2>
                         <div className="flex items-center space-x-2">
-                            {/* <CalendarDateRangePicker /> */}
-                            <Button>Download</Button>
+                            <Button>Export CSV</Button>
                         </div>
                     </div>
                     <Tabs defaultValue="overview" className="space-y-4">
                         <TabsList>
                             <TabsTrigger value="overview">Overview</TabsTrigger>
-                            <TabsTrigger value="analytics" disabled>
-                                Analytics
-                            </TabsTrigger>
-                            <TabsTrigger value="reports" disabled>
-                                Reports
-                            </TabsTrigger>
-                            <TabsTrigger value="notifications" disabled>
-                                Notifications
+                            <TabsTrigger value="receipts" disabled>
+                                Receipts
                             </TabsTrigger>
                         </TabsList>
                         <TabsContent value="overview" className="space-y-4">
@@ -45,74 +87,58 @@ const Analytics = () => {
                                         <CardTitle className="text-sm font-medium">
                                             Total Expenses
                                         </CardTitle>
-                                        <DollarSign size={16} className="text-muted-foreground" />
+                                        <DollarSign
+                                            size={16}
+                                            className="text-muted-foreground"
+                                        />
                                     </CardHeader>
                                     <CardContent>
                                         <div className="text-2xl font-bold">
-                                            $45,231.89
+                                            $
+                                            {personalPaymentsOverview?.total ||
+                                                0 + 0}
                                         </div>
-                                        <p className="text-xs text-muted-foreground">
+                                        {/* <p className="text-xs text-muted-foreground">
                                             +20.1% from last month
-                                        </p>
+                                        </p> */}
                                     </CardContent>
                                 </Card>
                                 <Card>
                                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                                         <CardTitle className="text-sm font-medium">
-                                            Subscriptions
+                                            All Time Personal Payments
                                         </CardTitle>
-                                        <svg
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            viewBox="0 0 24 24"
-                                            fill="none"
-                                            stroke="currentColor"
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
-                                            strokeWidth="2"
-                                            className="h-4 w-4 text-muted-foreground"
-                                        >
-                                            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
-                                            <circle cx="9" cy="7" r="4" />
-                                            <path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" />
-                                        </svg>
+                                        <DollarSign
+                                            size={16}
+                                            className="text-muted-foreground"
+                                        />
                                     </CardHeader>
                                     <CardContent>
                                         <div className="text-2xl font-bold">
-                                            +2350
+                                            ${personalPaymentsOverview?.total}
                                         </div>
                                         <p className="text-xs text-muted-foreground">
-                                            +180.1% from last month
+                                            {personalPaymentsOverview &&
+                                                renderPersonalPaymentChange(
+                                                    personalPaymentsOverview,
+                                                    personalPaymentPercentageChange
+                                                )}
                                         </p>
                                     </CardContent>
                                 </Card>
                                 <Card>
                                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                                         <CardTitle className="text-sm font-medium">
-                                            Sales
+                                            All Time Shared Payments
                                         </CardTitle>
-                                        <svg
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            viewBox="0 0 24 24"
-                                            fill="none"
-                                            stroke="currentColor"
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
-                                            strokeWidth="2"
-                                            className="h-4 w-4 text-muted-foreground"
-                                        >
-                                            <rect
-                                                width="20"
-                                                height="14"
-                                                x="2"
-                                                y="5"
-                                                rx="2"
-                                            />
-                                            <path d="M2 10h20" />
-                                        </svg>
+                                        <DollarSign
+                                            size={16}
+                                            className="text-muted-foreground"
+                                        />
                                     </CardHeader>
                                     <CardContent>
                                         <div className="text-2xl font-bold">
-                                            +12,234
+                                            $12,234
                                         </div>
                                         <p className="text-xs text-muted-foreground">
                                             +19% from last month
@@ -122,38 +148,35 @@ const Analytics = () => {
                                 <Card>
                                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                                         <CardTitle className="text-sm font-medium">
-                                            Active Now
+                                            All Time Payments made
                                         </CardTitle>
-                                        <svg
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            viewBox="0 0 24 24"
-                                            fill="none"
-                                            stroke="currentColor"
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
-                                            strokeWidth="2"
-                                            className="h-4 w-4 text-muted-foreground"
-                                        >
-                                            <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
-                                        </svg>
+                                        <DollarSign
+                                            size={16}
+                                            className="text-muted-foreground"
+                                        />
                                     </CardHeader>
                                     <CardContent>
                                         <div className="text-2xl font-bold">
-                                            +573
+                                            {personalPaymentsOverview?.count ||
+                                                0 + 0}
                                         </div>
-                                        <p className="text-xs text-muted-foreground">
-                                            +201 since last hour
-                                        </p>
                                     </CardContent>
                                 </Card>
                             </div>
                             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
                                 <Card className="col-span-4">
                                     <CardHeader>
-                                        <CardTitle>Overview</CardTitle>
+                                        <CardTitle>
+                                            Overview for the last 6 months
+                                        </CardTitle>
                                     </CardHeader>
                                     <CardContent className="pl-2">
-                                        <Overview />
+                                        <Overview
+                                            personalPaymentsLastSixMonths={
+                                                personalPaymentsOverview?.lastSixMonths ||
+                                                []
+                                            }
+                                        />
                                     </CardContent>
                                 </Card>
                                 <Card className="col-span-3">

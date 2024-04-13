@@ -88,7 +88,7 @@ export function DataTable<TData, TValue>({
                 value={globalFilter ?? ""}
                 onChange={(value) => setGlobalFilter(String(value))}
                 className="p-2 font-lg shadow border border-block max-w-sm"
-                placeholder="Search all columns..."
+                placeholder="Search..."
             />
             <div className="rounded-md border shadow-2xl ">
                 <Table>

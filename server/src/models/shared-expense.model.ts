@@ -123,7 +123,7 @@ sharedExpenseSchema.methods.calculateNextPaymentDate = function () {
     if (this.isNew) {
         nextPaymentDate = new Date(this.startDate);
     } else {
-        nextPaymentDate = new Date(this.nextPaymentDate);
+        nextPaymentDate = new Date(this.nextPaymentDate.getTime());
     }
 
     switch (this.frequency) {
@@ -270,6 +270,47 @@ export const SharedExpenseHistoryModel =
     mongoose.model<SharedExpenseHistoryDocument>(
         "SharedExpenseHistory",
         sharedExpenseHistorySchema
+    );
+
+// User Shared Expense History model
+export interface UserSharedExpenseHistory {
+    user: UserDocument["_id"];
+    sharedExpense: SharedExpenseHistoryDocument["_id"];
+    isOwner: boolean;
+}
+
+export interface UserSharedExpenseHistoryDocument
+    extends UserSharedExpenseHistory,
+        mongoose.Document {
+    createdAt: Date;
+    updatedAt: Date;
+}
+
+const userSharedExpenseHistorySchema =
+    new mongoose.Schema<UserSharedExpenseHistoryDocument>(
+        {
+            user: {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "User",
+                required: true,
+            },
+            sharedExpense: {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "SharedExpenseHistory",
+                required: true,
+            },
+            isOwner: {
+                type: Boolean,
+                required: true,
+            },
+        },
+        { timestamps: true }
+    );
+
+export const UserSharedExpenseHistoryModel =
+    mongoose.model<UserSharedExpenseHistoryDocument>(
+        "UserSharedExpenseHistory",
+        userSharedExpenseHistorySchema
     );
 
 // Shared Expense Invitation model

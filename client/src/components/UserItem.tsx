@@ -13,7 +13,7 @@ const UserItem: React.FC<{ user: User }> = ({ user }) => {
                 <AvatarFallback>CN</AvatarFallback>
             </Avatar>
             <div className="grow">
-                <p className="text-[16px] font-bold">{user.username}</p>
+                <p className="text-[16px] font-bold">@{user.username}</p>
                 <p className="text-[12px] text-neutral-500">{user.email}</p>
             </div>
         </div>
@@ -31,7 +31,7 @@ export const FriendItem: React.FC<{ friend: Friend }> = ({ friend }) => {
                 <AvatarFallback>CN</AvatarFallback>
             </Avatar>
             <div className="grow">
-                <p className="text-[16px] font-bold">{friend.username}</p>
+                <p className="text-[16px] font-bold">@{friend.username}</p>
             </div>
         </div>
     );

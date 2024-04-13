@@ -28,7 +28,7 @@ const LoginForm = () => {
         const loggedIn = await login(input);
         console.log(loggedIn);
         if (loggedIn) {
-            navigate("/home");
+            navigate("/analytics");
         }
     };
 

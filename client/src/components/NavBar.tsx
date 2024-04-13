@@ -13,11 +13,8 @@ import {
 import { useEffect, useState } from "react";
 import { Avatar, AvatarImage, AvatarFallback } from "./ui/avatar";
 import {
-    Home,
     LogIn,
     LogOut,
-    User,
-    History,
     AlignJustify,
     Coins,
     BarChart3,
@@ -44,11 +41,8 @@ const NavBar = () => {
     };
 
     const items = [
-        { name: "Home", to: "/home", icon: Home },
-        { name: "Profile", to: "/profile", icon: User },
-        { name: "History", to: "/expense-history", icon: History },
-        { name: "Expenses", to: "/expenses", icon: Coins },
-        { name: "Shared Expenses", to: "/shared-expenses", icon: Users},
+        { name: "Personal Expenses", to: "/expenses", icon: Coins },
+        { name: "Shared Expenses", to: "/shared-expenses", icon: Users },
         { name: "Analytics", to: "/analytics", icon: BarChart3 },
     ];
 

@@ -2,7 +2,6 @@ import { Button } from "@/components/ui/button";
 import {
     Card,
     CardContent,
-    CardDescription,
     CardFooter,
     CardHeader,
     CardTitle,
@@ -49,8 +48,11 @@ import {
     Pencil,
     Loader,
     Upload,
+    CircleFadingPlus,
+    History,
 } from "lucide-react";
 import { Logo } from "@/components/Logo";
+import ExpenseHistory from "./ExpenseHistory";
 
 const ItemsTable = ({ items }: { items: Item[] }) => {
     return (
@@ -130,8 +132,11 @@ const AddReceipt = () => {
     return (
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
             <DialogTrigger asChild>
-                <Button className="flex justify-center">
-                    <Pencil className="h-4 w-4 mr-2" />
+                <Button
+                    className="flex justify-center group rounded-xl"
+                    variant={"secondary"}
+                >
+                    <CircleFadingPlus className="h-4 w-4 mr-2 group-hover:animate-bounce" />
                     Add Receipt
                 </Button>
             </DialogTrigger>
@@ -226,7 +231,7 @@ const Receipts = () => {
 
     const receipts = data?.pages.flatMap((page) => page.receipts);
 
-    if (isLoading) return <div>Loading...</div>;
+    if (isLoading) return <Loader className="animate-spin" />;
 
     return (
         <div>
@@ -363,7 +368,7 @@ const RecurringPayments = () => {
                     plugins={[dayGridPlugin]}
                     initialView="dayGridMonth"
                     events={recurringExpenses.map((expense) => ({
-                        title: `${expense.name} - ${expense.amount}`,
+                        title: `${expense.name} - ${expense.amount}$`,
                         date: expense.nextPaymentDate,
                         id: expense._id,
                         className:
@@ -383,7 +388,7 @@ const Expenses = () => {
     return (
         <div className="flex justify-center mt-2">
             <Tabs defaultValue="receipts" className="w-3/4">
-                <TabsList className="grid w-full grid-cols-2">
+                <TabsList className="grid w-full grid-cols-3">
                     <TabsTrigger value="receipts">
                         <span className="mr-2">
                             <ReceiptText className="h-4 w-4" />
@@ -396,15 +401,22 @@ const Expenses = () => {
                         </span>
                         Recurring payments
                     </TabsTrigger>
+                    <TabsTrigger value="history">
+                        <span className="mr-2">
+                            <History className="h-4 w-4" />
+                        </span>
+                        Expense History
+                    </TabsTrigger>
                 </TabsList>
                 <TabsContent value="receipts">
                     <Card>
                         <CardHeader>
-                            <CardTitle>Your receipts</CardTitle>
-                            <CardDescription>
-                                Here are all your receipts
-                                <AddReceipt />
-                            </CardDescription>
+                            <CardTitle>
+                                <div className="flex items-center justify-between space-x-4">
+                                    <div>Receipt Management System</div>
+                                    <AddReceipt />
+                                </div>
+                            </CardTitle>
                         </CardHeader>
                         <CardContent className="space-y-2">
                             <Receipts />
@@ -417,17 +429,45 @@ const Expenses = () => {
                 <TabsContent value="recurring-payments">
                     <Card>
                         <CardHeader>
-                            <CardTitle>Recurring payments</CardTitle>
-                            <CardDescription>
-                                recurring payments
-                            </CardDescription>
+                            <CardTitle>
+                                <div className="flex items-center justify-between space-x-4">
+                                    <div>
+                                        Recurring Payments Management System
+                                    </div>
+                                    <Button
+                                        variant={"secondary"}
+                                        className="group rounded-xl"
+                                    >
+                                        <CircleFadingPlus className="h-4 w-4 mr-2 group-hover:animate-bounce" />
+                                        Add Recurring Payment
+                                    </Button>
+                                </div>
+                            </CardTitle>
                         </CardHeader>
                         <CardContent className="space-y-2">
                             <RecurringPayments />
                         </CardContent>
-                        <CardFooter>
-                            <Button>idk</Button>
-                        </CardFooter>
+                    </Card>
+                </TabsContent>
+                <TabsContent value="history">
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>
+                                <div className="flex items-center justify-between space-x-4">
+                                    <div>Past Payments</div>
+                                    <Button
+                                        variant={"secondary"}
+                                        className="group rounded-xl"
+                                    >
+                                        <CircleFadingPlus className="h-4 w-4 mr-2 group-hover:animate-bounce" />
+                                        Add Payment
+                                    </Button>
+                                </div>
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent className="w-full">
+                            <ExpenseHistory />
+                        </CardContent>
                     </Card>
                 </TabsContent>
             </Tabs>

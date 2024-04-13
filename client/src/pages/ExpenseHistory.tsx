@@ -163,7 +163,7 @@ const columns: ColumnDef<ExpenseHistoryType>[] = [
             const date = new Date(row.getValue("date"));
             return (
                 <div className="text-right font-medium">
-                    {date.toLocaleDateString(navigator.language)}
+                    {date.toLocaleDateString()}
                 </div>
             );
         },
@@ -225,7 +225,6 @@ const columns: ColumnDef<ExpenseHistoryType>[] = [
 
 const ExpenseHistory = () => {
     const { data: expenses, isError, isLoading } = useExpenseHistoryQuery();
-
     if (isLoading) return <Loader />;
     if (isError) {
         return <div>Couldn't load expenses</div>;
@@ -233,7 +232,7 @@ const ExpenseHistory = () => {
 
     return (
         expenses && (
-            <div className="container mx-auto py-2 shadow-2xl rounded-sm ">
+            <div className="rounded-sm ">
                 <DataTable columns={columns} data={expenses} />
             </div>
         )
