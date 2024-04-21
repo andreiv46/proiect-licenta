@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Overview } from "@/components/Overview";
-import { DollarSign, Loader } from "lucide-react";
+import { DollarSign, Loader, TrendingDown, TrendingUp } from "lucide-react";
 import {
     PersonalPaymentsOverview,
     usePersonalPaymentsOverviewQuery,
@@ -28,16 +28,32 @@ const renderPersonalPaymentChange = (
     personalPaymentsOverview: PersonalPaymentsOverview,
     personalPaymentPercentageChange: number
 ) => {
-    const monthYear1 = `${personalPaymentsOverview?.lastSixMonths[0].month}/${personalPaymentsOverview?.lastSixMonths[0].year}`;
-    const monthYear2 = `${personalPaymentsOverview?.lastSixMonths[1].month}/${personalPaymentsOverview?.lastSixMonths[1].year}`;
+    const monthYear1 = personalPaymentsOverview?.lastSixMonths?.[0]
+        ? `${personalPaymentsOverview.lastSixMonths[0].month}/${personalPaymentsOverview.lastSixMonths[0].year}`
+        : "";
+
+    const monthYear2 = personalPaymentsOverview?.lastSixMonths?.[1]
+        ? `${personalPaymentsOverview.lastSixMonths[1].month}/${personalPaymentsOverview.lastSixMonths[1].year}`
+        : "";
+
     const change = personalPaymentPercentageChange.toFixed(2);
     const moreOrLess = personalPaymentPercentageChange > 0 ? "more" : "less";
+    const moreOrLessIcon =
+        personalPaymentPercentageChange > 0 ? (
+            <TrendingUp size={16} color="blue" />
+        ) : (
+            <TrendingDown size={16} color="red" />
+        );
 
     return (
-        <>
-            In {monthYear1}, you spent {change}% {moreOrLess} than in{" "}
-            {monthYear2}
-        </>
+        <div className="flex">
+            {moreOrLessIcon}{" "}
+            <p className="ml-1">
+                {" "}
+                In {monthYear1}, you spent {change}% {moreOrLess} than in{" "}
+                {monthYear2}
+            </p>
+        </div>
     );
 };
 
@@ -57,8 +73,8 @@ const Analytics = () => {
     }
 
     const personalPaymentPercentageChange = increasedPercentage(
-        personalPaymentsOverview?.lastSixMonths[0].total,
-        personalPaymentsOverview?.lastSixMonths[1].total
+        personalPaymentsOverview?.lastSixMonths?.[0]?.total || 0,
+        personalPaymentsOverview?.lastSixMonths?.[1]?.total || 0
     );
 
     return (
@@ -98,9 +114,6 @@ const Analytics = () => {
                                             {personalPaymentsOverview?.total ||
                                                 0 + 0}
                                         </div>
-                                        {/* <p className="text-xs text-muted-foreground">
-                                            +20.1% from last month
-                                        </p> */}
                                     </CardContent>
                                 </Card>
                                 <Card>

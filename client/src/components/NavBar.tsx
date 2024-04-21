@@ -125,7 +125,12 @@ const NavBar = () => {
                 <div className="flex items-center space-x-4">
                     {user ? (
                         <>
-                            <UserItem user={user} />
+                            <div
+                                className="hover:bg-gray-200 cursor-pointer"
+                                onClick={() => navigate("/profile")}
+                            >
+                                <UserItem user={user} />
+                            </div>
                             <Button
                                 className="font-semibold"
                                 variant="outline"

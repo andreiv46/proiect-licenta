@@ -35,11 +35,30 @@ export interface UserSharedExpense {
     notify: boolean;
 }
 
+export interface SharedExpenseInvite {
+    _id: string;
+    sharedExpense: SharedExpense;
+    user: SharedExpenseUser;
+    invitedBy: SharedExpenseUser;
+    amount: number;
+    status: string;
+    createdAt: Date;
+}
+
 const getSharedExpenses = async (): Promise<UserSharedExpense[]> => {
     console.log("Fetching shared expenses");
     return axios
         .get("/shared-expense/")
         .then((response: AxiosResponse<UserSharedExpense[]>) => response.data);
+};
+
+const getSharedExpenseInvites = async (): Promise<SharedExpenseInvite[]> => {
+    console.log("Fetching shared expense invites");
+    return axios
+        .get("/shared-expense/invites")
+        .then(
+            (response: AxiosResponse<SharedExpenseInvite[]>) => response.data
+        );
 };
 
 export const useSharedExpensesQuery = (): UseQueryResult<
@@ -48,6 +67,16 @@ export const useSharedExpensesQuery = (): UseQueryResult<
     return useQuery({
         queryKey: ["shared-expense"],
         queryFn: getSharedExpenses,
+        staleTime: 1000 * 30,
+    });
+};
+
+export const useSharedExpenseInvitesQuery = (): UseQueryResult<
+    SharedExpenseInvite[]
+> => {
+    return useQuery({
+        queryKey: ["shared-expense-invites"],
+        queryFn: getSharedExpenseInvites,
         staleTime: 1000 * 30,
     });
 };

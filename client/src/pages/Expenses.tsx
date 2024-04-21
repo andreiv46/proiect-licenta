@@ -405,7 +405,7 @@ const Expenses = () => {
                         <span className="mr-2">
                             <History className="h-4 w-4" />
                         </span>
-                        Expense History
+                        History
                     </TabsTrigger>
                 </TabsList>
                 <TabsContent value="receipts">

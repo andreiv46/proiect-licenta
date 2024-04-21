@@ -8,20 +8,18 @@ import {
     CardTitle,
 } from "@/components/ui/card";
 import {
-    User,
     Handshake,
-    Check,
-    UserRoundX,
-    UserRoundCheck,
-    UserRoundPlus,
     Loader,
-    UserRoundSearch,
     CalendarDays,
-    UserRoundMinus,
+    ClipboardCopy,
+    Crown,
+    BellRing,
+    BellOff,
+    Inbox,
+    CircleFadingPlus,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { FriendItem } from "@/components/UserItem";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import {
     Select,
@@ -40,242 +38,18 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { MoreHorizontal, AlertCircle } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
-import { ReactNode, useState, useEffect } from "react";
-import {
-    useFriendsQuery,
-    findFriend,
-    useFriendRequestsQuery,
-    useAcceptFriendRequestMutation,
-    useRejectFriendRequestMutation,
-    useCreateFriendRequestMutation,
-    FindFriend,
-} from "@/api/friend.api";
+import { useState } from "react";
 import {
     UserSharedExpense,
     SharedExpenseFriend,
+    SharedExpenseInvite,
     useSharedExpensesQuery,
+    useSharedExpenseInvitesQuery,
 } from "@/api/shared-expense.api";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/hooks/useAuth";
 import { Logo } from "@/components/Logo";
-import { cn } from "@/lib/utils";
-
-const FriendSection = ({
-    title,
-    children,
-    className,
-}: {
-    title: string;
-    children: ReactNode;
-    className?: string;
-}) => (
-    <div>
-        <h1 className="text-center">{title}</h1>
-        <div className={cn("space-y-2 mt-2", className)}>{children}</div>
-    </div>
-);
-
-const CurrentFriends = () => {
-    const { data: friends, isLoading } = useFriendsQuery();
-
-    if (isLoading) {
-        return <Loader className="animate-spin" />;
-    }
-
-    if (!friends) return <div>No friends</div>;
-
-    return (
-        <FriendSection
-            title="Current Friends"
-            className="rounded-lg shadow-2xl border-2 border-gray-300 p-1"
-        >
-            {friends.map((friend) => (
-                <div>
-                    <div className="flex items-center justify-between space-x-4">
-                        <div className="flex items-center space-x-4">
-                            <FriendItem key={friend._id} friend={friend} />
-                        </div>
-                        <div className="flex items-center space-x-4">
-                            <Button
-                                size="sm"
-                                variant="destructive"
-                                className="w-full"
-                            >
-                                <UserRoundMinus
-                                    size="16"
-                                    className="text-red-300"
-                                />
-                            </Button>
-                        </div>
-                    </div>
-                    <Separator className="mt-4 bg-slate-300" />
-                </div>
-            ))}
-        </FriendSection>
-    );
-};
-
-const FriendRequests = () => {
-    const { data: friendRequests, isLoading } = useFriendRequestsQuery();
-    const { mutate: acceptFriendRequest } = useAcceptFriendRequestMutation();
-    const { mutate: rejectFriendRequest } = useRejectFriendRequestMutation();
-
-    if (isLoading) {
-        return <Loader className="animate-spin" />;
-    }
-
-    if (!friendRequests) return <div>No friend requests</div>;
-
-    return (
-        <FriendSection title="Friend Requests">
-            {friendRequests.map((request) => (
-                <div
-                    key={request._id}
-                    className="flex-col p-2 rounded-lg shadow-2xl border-2 border-gray-300"
-                >
-                    <FriendItem friend={request.sender} />
-                    <div className="flex flex-row">
-                        <Button
-                            size="sm"
-                            className="mr-1 w-full"
-                            onClick={() => acceptFriendRequest(request._id)}
-                        >
-                            <UserRoundCheck
-                                size="16"
-                                className="text-green-500"
-                            />
-                        </Button>
-                        <Button
-                            size="sm"
-                            variant="destructive"
-                            className="w-full"
-                            onClick={() => rejectFriendRequest(request._id)}
-                        >
-                            <UserRoundX size="16" className="text-red-300" />
-                        </Button>
-                    </div>
-                </div>
-            ))}
-        </FriendSection>
-    );
-};
-
-const SearchFriends = () => {
-    const [searchTerm, setSearchTerm] = useState<string>("");
-    const [query, setQuery] = useState<string | null>(null);
-    const [friend, setFriend] = useState<FindFriend | null>(null);
-    const [isLoading, setIsLoading] = useState<boolean>(false);
-    const [isError, setIsError] = useState<boolean>(false);
-    const [isFriendAdded, setIsFriendAdded] = useState<boolean>(false);
-    const { mutate: createFriendRequest } = useCreateFriendRequestMutation();
-
-    useEffect(() => {
-        if (query) {
-            setIsLoading(true);
-            setFriend(null);
-            setIsError(false);
-            setIsFriendAdded(false);
-            findFriend(query)
-                .then((friend) => {
-                    setFriend(friend);
-                    setIsLoading(false);
-                    friend.isFriendRequestSent && setIsFriendAdded(true);
-                })
-                .catch(() => {
-                    setIsError(true);
-                    setIsLoading(false);
-                });
-        }
-    }, [query]);
-
-    const handleSearch = () => {
-        setQuery(searchTerm);
-    };
-
-    const handleAddFriend = () => {
-        const username = friend?.username;
-        if (!username) return;
-        console.log("Adding friend", username);
-        createFriendRequest(username);
-        setIsFriendAdded(true);
-    };
-
-    return (
-        <FriendSection title="Find Friends">
-            <div className="grid grid-cols-4 gap-4">
-                <Input
-                    className="col-span-3 shadow-2xl "
-                    placeholder="Search for friends"
-                    value={searchTerm}
-                    onChange={(e) => {
-                        setSearchTerm(e.target.value);
-                    }}
-                    onKeyDown={(e) => {
-                        if (e.key === "Enter") {
-                            handleSearch();
-                        }
-                    }}
-                />
-                <Button
-                    className="col-span-1 bg-blue-500 hover:bg-blue-600"
-                    onClick={handleSearch}
-                >
-                    <UserRoundSearch size="24" className="text-green-400" />
-                </Button>
-            </div>
-            {friend && (
-                <div className="flex flex-col p-2 rounded-lg shadow-2xl border-2 border-gray-300">
-                    <FriendItem
-                        friend={{ username: friend.username, _id: friend._id }}
-                    />
-                    {!isFriendAdded ? (
-                        <Button
-                            size="sm"
-                            variant={"default"}
-                            onClick={handleAddFriend}
-                            className="w-full mt-2"
-                        >
-                            <UserRoundPlus
-                                size="16"
-                                className="text-green-500"
-                            />
-                        </Button>
-                    ) : (
-                        <Button
-                            size="sm"
-                            variant={"default"}
-                            className="w-full mt-2"
-                            disabled={true}
-                        >
-                            <Check size="30" className="text-green-500" />
-                        </Button>
-                    )}
-                </div>
-            )}
-            {isLoading && (
-                <div className="flex flex-col justify-center items-center p-2 rounded-lg shadow-2xl border-2 border-gray-300">
-                    <Loader className="animate-spin" />
-                </div>
-            )}
-            {isError && (
-                <div className="flex flex-col justify-center items-center p-2 rounded-lg shadow-2xl border-2 border-gray-300">
-                    <p>User not found</p>
-                </div>
-            )}
-        </FriendSection>
-    );
-};
-
-const Friends = () => {
-    return (
-        <div className="grid grid-cols-3 gap-4">
-            <CurrentFriends />
-            <FriendRequests />
-            <SearchFriends />
-        </div>
-    );
-};
 
 const SharedExpenseCard = ({
     sharedExpense,
@@ -305,7 +79,14 @@ const SharedExpenseCard = ({
             <CardHeader>
                 <CardTitle>
                     <div className="flex items-center justify-between space-x-4">
-                        {sharedExpense.sharedExpense.name}
+                        <div className="flex">
+                            {sharedExpense.isOwner && (
+                                <Badge className="text-white mr-1 text-lg bg-yellow-300 hover:bg-yellow-400">
+                                    <Crown color="purple" />
+                                </Badge>
+                            )}
+                            {sharedExpense.sharedExpense.name}
+                        </div>
                         {sharedExpense.isOwner && (
                             <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
@@ -389,7 +170,7 @@ const SharedExpenseCard = ({
                             setTimeout(() => setIsClicked(false), 500);
                         }}
                     >
-                        Copy
+                        <ClipboardCopy className="opacity-80" size="20" />
                     </Button>
                 </div>
                 <Separator className="my-4" />
@@ -435,15 +216,15 @@ const SharedExpenseCard = ({
                                                 : "do-not-notify"
                                         }
                                     >
-                                        <SelectTrigger className="ml-auto w-[110px]">
+                                        <SelectTrigger className="ml-auto w-[60px]">
                                             <SelectValue placeholder="Select" />
                                         </SelectTrigger>
                                         <SelectContent>
                                             <SelectItem value="notify">
-                                                Notify me
+                                                <BellRing size="16" />
                                             </SelectItem>
                                             <SelectItem value="do-not-notify">
-                                                Do not notify me
+                                                <BellOff size="16" />
                                             </SelectItem>
                                         </SelectContent>
                                     </Select>
@@ -482,10 +263,10 @@ const SharedExpenseCard = ({
                                             </SelectTrigger>
                                             <SelectContent>
                                                 <SelectItem value="notify">
-                                                    Notify me
+                                                    <BellRing size="16" />
                                                 </SelectItem>
                                                 <SelectItem value="do-not-notify">
-                                                    Do not notify me
+                                                    <BellOff size="16" />
                                                 </SelectItem>
                                             </SelectContent>
                                         </Select>
@@ -551,6 +332,59 @@ const SharedExpensesContent = () => {
     ));
 };
 
+const Invites = () => {
+    const {
+        data: invites,
+        isLoading,
+        isError,
+    } = useSharedExpenseInvitesQuery();
+
+    if (isLoading) {
+        return <Loader className="animate-spin" />;
+    }
+
+    if (isError) {
+        return <div>Error fetching shared expense invites</div>;
+    }
+
+    if (!invites || invites.length === 0) {
+        return <div>No invites</div>;
+    }
+
+    return invites.map((invite: SharedExpenseInvite) => (
+        <Card className="border-2 border-gray-300 bg-white mt-2">
+            <CardHeader>
+                <CardTitle>
+                    <div className="flex items-center justify-between space-x-4">
+                        <div className="flex items-center space-x-4">
+                            <Avatar>
+                                <AvatarImage src="https://github.com/shadcn.png" />
+                                <AvatarFallback>OM</AvatarFallback>
+                            </Avatar>
+                            <div className="text-sm text-muted-foreground">
+                                <p>{invite.invitedBy.username}</p>
+                                <p>
+                                    Invited you to join "
+                                    {invite.sharedExpense.name}"
+                                </p>
+                            </div>
+                        </div>
+                        <div className="grid grid-cols-2 gap-2">
+                            <Button variant="secondary">Accept</Button>
+                            <Button variant="destructive">Decline</Button>
+                        </div>
+                    </div>
+                </CardTitle>
+            </CardHeader>
+            <CardContent>
+                <p>Amount: {invite.amount}</p>
+                <p>Frequency: {invite.sharedExpense.frequency}</p>
+                <p>Recipient: {invite.sharedExpense.recipient || "Not set"}</p>
+            </CardContent>
+        </Card>
+    ));
+};
+
 const SharedExpenses = () => {
     return (
         <div className="flex justify-center mt-2">
@@ -562,11 +396,11 @@ const SharedExpenses = () => {
                         </span>
                         Shared payments
                     </TabsTrigger>
-                    <TabsTrigger value="friends">
+                    <TabsTrigger value="invites">
                         <span className="mr-2">
-                            <User className="h-4 w-4" />
+                            <Inbox className="h-4 w-4" />
                         </span>
-                        Friends
+                        Invites
                     </TabsTrigger>
                 </TabsList>
                 <TabsContent value="shared-payments">
@@ -574,10 +408,16 @@ const SharedExpenses = () => {
                         <CardHeader>
                             <div className="flex items-center justify-between space-x-4">
                                 <CardTitle>Group Payment Manager</CardTitle>
-                                <Button variant="outline">
-                                    <CalendarDays className="h-4 w-4 mr-1" />
-                                    View On Calendar
-                                </Button>
+                                <div>
+                                    <Button variant="outline">
+                                        <CircleFadingPlus className="h-4 w-4 mr-1" />
+                                        Create New Group
+                                    </Button>
+                                    <Button variant="outline">
+                                        <CalendarDays className="h-4 w-4 mr-1" />
+                                        View On Calendar
+                                    </Button>
+                                </div>
                             </div>
                         </CardHeader>
                         <CardContent className="space-y-2">
@@ -586,10 +426,10 @@ const SharedExpenses = () => {
                         <CardFooter>{/* <Logo /> */}</CardFooter>
                     </Card>
                 </TabsContent>
-                <TabsContent value="friends">
+                <TabsContent value="invites">
                     <Card className="min-h-80">
                         <CardContent className="space-y-2">
-                            <Friends />
+                            <Invites />
                         </CardContent>
                     </Card>
                 </TabsContent>

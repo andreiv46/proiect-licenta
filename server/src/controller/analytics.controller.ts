@@ -11,6 +11,7 @@ export async function getPersonalPaymentsOverviewHandler(
         const personalPaymentsOverview = await getPersonalPaymentsOverview(
             req.user?.id!
         );
+        console.log(personalPaymentsOverview);
         return res.json(personalPaymentsOverview);
     } catch (error: unknown) {
         next(error);

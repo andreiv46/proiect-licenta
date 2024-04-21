@@ -4,7 +4,7 @@ import { Friend } from "@/api/friend.api";
 
 const UserItem: React.FC<{ user: User }> = ({ user }) => {
     return (
-        <div className="flex items-center justify-between gap-2 border rounded-[8px] p-2">
+        <div className="flex items-center justify-between gap-2 rounded-[8px] p-2">
             <Avatar>
                 <AvatarImage
                     src="https://github.com/shadcn.png"

@@ -65,7 +65,7 @@ export async function getPersonalPaymentsOverview(
     ]);
     return {
         lastSixMonths: result?.lastSixMonths || [],
-        total: result?.total[0].total || 0,
-        count: result?.total[0].count || 0,
+        total: result?.total?.[0]?.total || 0,
+        count: result?.total?.[0]?.count || 0,
     };
 }

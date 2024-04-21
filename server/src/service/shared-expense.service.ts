@@ -61,7 +61,7 @@ export async function getSharedExpenseInvites(userId: string) {
     const invites = await SharedExpenseInvitationModel.find({
         user: userId,
         status: "pending",
-    }).populate("sharedExpense");
+    }).populate(["sharedExpense", { path: "invitedBy", select: "username" }]);
     if (!invites) {
         throw new SharedExpensesInvitesNotFoundError();
     }
